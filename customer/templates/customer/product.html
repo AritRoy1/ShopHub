@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% load static %}
+
+<form action="" method = "POST">
+   {% for fm  in form %}
+   {{fm.label_tag}} {{fm}} {{fm.errors}} <br> <br>
+   
+   {% endfor %}
+
+
+</form>
