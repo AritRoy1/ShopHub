@@ -12,15 +12,19 @@ from product.models import Category, Image, Product, SubCategory
 
 def home(request):
     category = Category.objects.all()
+    subcatagory = SubCategory.objects.all()
+    dict1={}
+    for item in category:
+
+        dict1[item.name]=SubCategory.objects.filter(category__name = item.name)    
     
-    
-    return render(request, 'customer/home.html', {'category':category})
+    return render(request, 'customer/home.html', {'category':category, "dict1":dict1})
 
 def CustomerRegistration(request):
     if request.method == "POST":
         form = CustomerRegistrationForm(request.POST)
         # form = CustomerRegistrationForm(request.POST) 
-        if form.is_valid():
+        if form.is_valid(): 
             form.save()
             return HttpResponseRedirect('/login/')
         
@@ -71,12 +75,43 @@ class Login(View):
 def logout_view(request):
     logout(request)
     return HttpResponseRedirect('/login/')
-
-  
-     
-class ProductDetail(View):
-    def get(self, request):
+       
+        
+class ProductList(View):
+    def get(self, request, pk):
+        
+        category = Category.objects.all()
+        subcatagory = SubCategory.objects.get(pk=pk)
         phone = Product.objects.filter(id=1)
         category = Category.objects.all()
-        img = Image.objects.all()
-        return render(request, 'customer/electronics.html', {"phone":phone, "img":img, 'category':category})
+        img = Image.objects.filter(product__sub__id=pk)
+        dict1={}
+        
+        for item in category:
+
+            dict1[item.name]=SubCategory.objects.filter(category__name = item.name)
+
+        return render(request, 'customer/list_product.html', {'dict1':dict1, 'subcatagory':subcatagory, "img":img,})
+        
+        
+        # return render(request, 'customer/list_product.html', {'dict1':dict1,
+        #                 "phone":phone, "img":img, 'category':category, 'subcatagory':subcatagory})
+
+
+class ProductDetail(View):
+    def get(self, request, pk):
+        category = Category.objects.all()
+        dict1={}
+        for item in category:
+            dict1[item.name]=SubCategory.objects.filter(category__name = item.name)
+            
+        print(pk)   
+        
+        phone = Product.objects.filter(id=pk)
+        
+        img = Image.objects.get(pk=pk)
+        return render(request, 'customer/product_detail.html', {"phone":phone,
+                "img":img, 'category':category, 'dict1':dict1})
+
+class Cart(View):
+    pass

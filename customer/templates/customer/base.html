@@ -69,58 +69,49 @@
             Category
           </a>
           <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-            {% for item in category %}
+
+            {% for item, value in dict1.items %} 
             
             <li class="dropdown-submenu">
-              <a class="dropdown-item dropdown-toggle" href="#">{{item.name}}</a>
+              {% comment %} <a class="dropdown-item dropdown-toggle" href="#">{{item.name}}</a> {% endcomment %}
+              <a class="dropdown-item dropdown-toggle" href="#">{{item}}</a>
+
 
               <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="#">Submenu action</a></li>
-                </ul>
-            
-            {% endfor %}
-
-
-            
-            <li class="dropdown-submenu">
-              <a class="dropdown-item dropdown-toggle" href="#">Submenu</a>
-
-              <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="#">Submenu action</a></li>
-                <li><a class="dropdown-item" href="#">Another submenu action</a></li>
-  
-  
-                <li class="dropdown-submenu">
-                  <a class="dropdown-item dropdown-toggle" href="#">Subsubmenu</a>
-                  <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="#">Subsubmenu action</a></li>
-                    <li><a class="dropdown-item" href="#">Another subsubmenu action</a></li>
-                  </ul>
-                </li>
-                <li class="dropdown-submenu">
-                  <a class="dropdown-item dropdown-toggle" href="#">Second subsubmenu</a>
-                  <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="#">Subsubmenu action</a></li>
-                    <li><a class="dropdown-item" href="#">Another subsubmenu action</a></li>
-                  </ul>
-                </li>
-  
-  
-  
+              
+                  {% for j in value %}
+                  
+                  
+                     <li><a class="dropdown-item" href="{% url 'product-list' j.id %}"> {{j.name}} </a></li>
+                  {% endfor  %}
               </ul>
+             
             </li>
+            
+            {% endfor category %} 
+
+              
+            
           </ul>
         </li>
 
     
 
+
+
       </ul>
+
+    
 
       {% if request.user.is_authenticated %}
 
       <li class="nav-item">
         <a class="navbar-brand" style="color: black; font-size:30px;" href="{% url 'vendor-registration' %}">Become a vendor</a>
       </li>
+
+      {% comment %} kon sa user log in hai  {% endcomment %}
+
+      {% comment %} <h1>User: {{user.get_username}} </h1> {% endcomment %}
 
       <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle"  style="color: black; font-size:30px;"  href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -162,6 +153,7 @@
   </div>
 </nav>
 
+
 </div>
 {% block slider %}
 
@@ -171,9 +163,14 @@
 
 {% endblock Customer-registration %}
 
+{% block product-list %}
+
+{% endblock product-list %}
+
 {% block product-details %}
 
 {% endblock product-details %}
+
 
 
    {% comment %} footer {% endcomment %}
@@ -323,4 +320,6 @@
   
     return false;
   });
+
+
 </script>

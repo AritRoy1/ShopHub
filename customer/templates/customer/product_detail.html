@@ -1,0 +1,31 @@
+{% extends "customer/base.html" %} {% block product-details %} {% load static %}
+
+<style>
+  .cont {
+    display: flex;
+    margin: 15px;
+    justify-content: space-around;
+  }
+</style>
+<h1>Mobile</h1>
+
+<div class="row my-3">
+  <div class="col-sm-3">
+    <img src="{{ img.image.url }}" width="300px" height="400" alt="not" />
+    <br />
+    <div class="cont">
+      <a href="{% url 'cart' %}">
+        <button type="button" class="btn btn-warning">Add To Cart</button>
+      </a>
+      <button type="button" class="btn btn-info">Buy Now</button>
+    </div>
+  </div>
+  <div class="col-sm-3">
+    {{img.product.name}} <br />
+
+    <b> Rs. {{img.product.price}} </b> <br />
+    {{img.product.description}}
+  </div>
+</div>
+
+{% endblock product-details %}
