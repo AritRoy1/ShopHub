@@ -113,5 +113,3 @@ class ProductDetail(View):
         return render(request, 'customer/product_detail.html', {"phone":phone,
                 "img":img, 'category':category, 'dict1':dict1})
 
-class Cart(View):
-    pass

@@ -2,6 +2,7 @@ from django.urls import path
 from customer import views
 from django.contrib.auth import views as auth_view
 from .forms import LoginForm
+
 urlpatterns = [
     
     path('home/',views.home, name="home"),
@@ -17,7 +18,7 @@ urlpatterns = [
     path('electronics-detail/', views.ProductDetail.as_view() ,name='Electronics'),
     path('product-list/<int:pk>', views.ProductList.as_view(), name="product-list"),
     path('product-detail/<int:pk>', views.ProductDetail.as_view(), name='product-detail'),
-    path('cart/', views.Cart.as_view(), name = 'cart')
+    
     
     
         

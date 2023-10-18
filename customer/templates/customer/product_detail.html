@@ -2,7 +2,7 @@
 
 <style>
   .cont {
-    display: flex;
+    display: left;
     margin: 15px;
     justify-content: space-around;
   }
@@ -13,12 +13,16 @@
   <div class="col-sm-3">
     <img src="{{ img.image.url }}" width="300px" height="400" alt="not" />
     <br />
-    <div class="cont">
-      <a href="{% url 'cart' %}">
-        <button type="button" class="btn btn-warning">Add To Cart</button>
-      </a>
-      <button type="button" class="btn btn-info">Buy Now</button>
+    <form action="/product/add-to-cart"> 
+        <div class="cont">
+        <input type="hidden" name="prod_id" value="{{img.id}}" id="prod_id">
+        <button type="submit" class="btn btn-warning shadow px-5 py-2">Add To Cart</button>
+        <button type="submit" class="btn btn-info shadow px-5 py-2">Buy Now</button>
+
     </div>
+    </form>
+
+    
   </div>
   <div class="col-sm-3">
     {{img.product.name}} <br />
@@ -26,6 +30,7 @@
     <b> Rs. {{img.product.price}} </b> <br />
     {{img.product.description}}
   </div>
+  
 </div>
 
 {% endblock product-details %}

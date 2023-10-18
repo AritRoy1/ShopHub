@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Product, Image, Category, SubCategory
+from .models import Product, Image, Category, SubCategory, Cart, Order
 
 # Register your models here.
 
@@ -19,3 +19,10 @@ class ImageAdmin(admin.ModelAdmin):
 class SubCategoryAdmin(admin.ModelAdmin):
     list_display = ['id', 'name', 'category']
 
+@admin.register(Cart)
+class SubCategoryAdmin(admin.ModelAdmin):
+    list_display = ['id', 'customer', 'product', 'quantity', 'image']
+    
+@admin.register(Order)
+class SubCategoryAdmin(admin.ModelAdmin):
+    list_display = ['id', 'customer', 'product', 'quantity', 'order_date', 'status']
