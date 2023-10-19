@@ -13,12 +13,13 @@ from product.models import Category, Image, Product, SubCategory
 def home(request):
     category = Category.objects.all()
     subcatagory = SubCategory.objects.all()
+    image = Image.objects.all()
     dict1={}
     for item in category:
 
         dict1[item.name]=SubCategory.objects.filter(category__name = item.name)    
     
-    return render(request, 'customer/home.html', {'category':category, "dict1":dict1})
+    return render(request, 'customer/home.html', {'category':category, "dict1":dict1, 'image':image})
 
 def CustomerRegistration(request):
     if request.method == "POST":

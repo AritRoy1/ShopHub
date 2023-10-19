@@ -1,0 +1,10 @@
+{% extends "customer/base.html" %}
+
+{% block showcart %}
+{% load static %}
+<div class="text-center ">
+    <h1 class="text-center my-5">You Have Nothing In Cart</h1>
+
+    <img src="{% static 'product/images/cart.jpg' %}" alt="" height="300px" width="500px">
+</div>
+{% endblock showcart %}
