@@ -18,11 +18,12 @@
 
 {% comment %} header {% endcomment %}
  
-<div class="nav-body">
+<div class="nav-body" style="height:63px">
 
-<nav class="navbar navbar-expand-lg ">
-  <img src="{% static 'customer/images/logo4.jpg' %}" alt="" height="70px" width="70px" style="background:none;">
-  <a class="navbar-brand"  style="color: black ; font-size:30px;"  href="{% url 'home' %}">ShopHub</a>
+<nav class="navbar navbar-expand-lg " style="height:32px">
+  <a href="{% url "home" %}">
+  <img src="{% static 'customer/images/e2.png' %}" alt="" height="100px" width="160px"> </a>
+  {% comment %} <a class="navbar-brand"  style="color: black ; font-size:20px;"  href="{% url 'home' %}">ShopHub</a> {% endcomment %}
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
@@ -32,16 +33,16 @@
   <div class="collapse navbar-collapse" id="navbarSupportedContent">
     <ul class="navbar-nav mr-auto">
       <li class="nav-item ">
-        <a class="navbar-brand"  style="color: black; font-size:30px;"  href="{% url "home" %}">Home <span class="sr-only">(current)</span></a>
+        <a class="navbar-brand"  style="color: black; font-size:20px; margin: 3px 18px;"  href="{% url "home" %}">Home <span class="sr-only">(current)</span></a>
       </li>
-      <li class="nav-item">
-        <a class="navbar-brand"  style="color: black; font-size:30px;"  href="#">ContactUs</a>
-      </li>
+      {% comment %} <li class="nav-item">
+        <a class="navbar-brand"  style="color: black; font-size:20px;"  href="#">ContactUs</a>
+      </li> {% endcomment %}
      
     
 
         <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" style="color: black; font-size:30px;" href="http://example.com" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <a class="nav-link dropdown-toggle" style="color: black; font-size:20px;" href="http://example.com" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             Category
           </a>
          
@@ -65,33 +66,23 @@
              
             </li>
             
-            {% endfor category %} 
-
-              
-            
+            {% endfor category %}             
           </ul>
         </li>
 
-    
-
-
-
       </ul>
-
-    
-
       {% if request.user.is_authenticated %}
 
-      <li class="nav-item">
-        <a class="navbar-brand" style="color: black; font-size:30px;" href="{% url 'vendor-registration' %}">Become a vendor</a>
+      <li class="nav-item" style="list-style: none;">
+        <a class="navbar-brand" style="color: black; font-size:20px;" href="{% url 'vendor-registration' %}">Become a vendor</a>
       </li>
 
       {% comment %} kon sa user log in hai  {% endcomment %}
 
       {% comment %} <h1>User: {{user.get_username}} </h1> {% endcomment %}
 
-      <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle"  style="color: black; font-size:30px;"  href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      <li class="nav-item dropdown" style="list-style: none;">
+        <a class="nav-link dropdown-toggle"  style="color: black; font-size:20px;"  href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           Profile
         </a>
         
@@ -101,18 +92,13 @@
           <a class="dropdown-item" href="{% url 'vendor-registration' %}">LogIn for Vendor</a> {% endcomment %}
           
           <a class="dropdown-item" href="{% url 'logout' %}">LogOut</a>
-
-          
           </div> 
-
         </li>
          
-
-
         
-        <li class="nav-item">
+        <li class="nav-item" style="list-style: none;">
           
-          <a class="navbar-brand"  style="color: black; font-size:30px;"  href="{% url 'showcart' %}">   <i class="fa fa-shopping-cart"></i>Cart</a>
+          <a class="navbar-brand"  style="color: black; font-size:20px;"  href="{% url 'showcart' %}">   <i class="fa fa-shopping-cart"></i>  Cart</a>
          
         </li>
         {% comment %} li ko utha ke 66 me lgaya hai  hint error  {% endcomment %}
@@ -121,22 +107,38 @@
     {% else %} 
         
     <li class="nav-item">
-        <a class="navbar-brand"  style="color: black; font-size:30px;"  href="{% url 'customer-registration' %}">SignUp</a>
+        <a class="navbar-brand"  style="color: black; font-size:20px;"  href="{% url 'customer-registration' %}">SignUp</a>
       </li>
       <li class="nav-item ">
-        <a class="navbar-brand"  style="color: black; font-size:30px;"  href="{% url 'login' %}">LogIn</a>
+        <a class="navbar-brand"  style="color: black; font-size:20px;"  href="{% url 'login' %}">LogIn</a>
       </li>
 
       {% endif %}
         
   </div>
 </nav>
+  
+   <!--using search bar everywhere -->
+
+{% comment %} <div style=" margin-top: 19px; float: right;">
+  <form class="form-inline my-2 my-lg-0" action="/product/search/" method="GET">
+    <input class="form-control mr-sm-2" type="search" placeholder="Search Item" aria-label="Search" name="search">
+    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+  </form>
+  </div> {% endcomment %}
 
 
 </div>
+
+
+
 {% block slider %}
 
 {% endblock slider %}
+
+{% block elctronics %}
+
+{% endblock elctronics %}
 
 {% block Customer-registration %}
 
@@ -153,6 +155,8 @@
 {% block showcart %}
 {% endblock showcart %}
 
+{% block search %}
+{% endblock search %}
 
 {% block product %}
 
@@ -166,9 +170,9 @@
   <div class="container pt-5 border-bottom">
     <div class="row">
       <div class="col-md-3 col-sm-12 mb-3 text-center">
-        <svg class="img-fluid" width="200px" height="60px" viewBox="0 0 200 60" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-                <!-- Generator: Sketch 51.3 (57544) - http://www.bohemiancoding.com/sketch -->
-                <desc>Created with Sketch.</desc>
+        {% comment %} <svg class="img-fluid" width="200px" height="60px" viewBox="0 0 200 60" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"> {% endcomment %}
+          <img src="{% static 'customer/images/e2.png' %}" alt="" height="100px" width="160px">                
+          <desc></desc>
                 <defs>
                   <linearGradient x1="46.3528198%" y1="45.7301342%" x2="92.3528198%" y2="93.7383901%" id="linearGradient-1">
                     <stop stop-color="#0062A5" offset="0%"></stop>

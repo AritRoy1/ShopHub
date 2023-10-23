@@ -1,33 +1,49 @@
-{% extends "customer/base.html" %} {% load static %} {% block slider %}
+{% extends "customer/base.html" %} {% load static %} 
+
+{% block slider %}
+
+
+
+<div style=" margin-top: 19px; float: right;">
+<form class="form-inline my-2 my-lg-0" action="/product/search/" method="GET">
+  <input class="form-control mr-sm-2" type="search" placeholder="Search Item" aria-label="Search" name="search">
+  <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+</form>
+</div>
+
+
 
 <link rel="stylesheet" href="{% static 'customer/css/style2.css' %}" />
 
-<div class="slideshow-container mt-5">
+ 
 
+<div style="padding:43px;">
+
+<div class="slideshow-container mt-5 my-6 mx-6">
   {% for img in image %}
   <div class="mySlides fade">
     <div class="numbertext"></div>
-    <img
-      src="{{img.image.url}}"
-      width="100%"
-      height="400"
-    />
+    <img src="{{img.image.url}}" width="100%" height="500px" />
     <div class="text"></div>
   </div>
   {% endfor %}
-
-
-  
-
 </div>
 <br />
 
 <div style="text-align: center">
-  {% for img in image %}
+  {% for img in image|slice:":5" %}
   <span class="dot"></span>
- 
+
   {% endfor %}
 </div>
+
+ <hr>
+ </div>
+
+{% comment %} printing images for home page {% endcomment %}
+
+
+
 
 <script>
   let slideIndex = 0;
@@ -37,14 +53,14 @@
     let i;
     let slides = document.getElementsByClassName("mySlides");
     let dots = document.getElementsByClassName("dot");
-    for (i = 0; i < slides.length; i++) {
+    for (i = 0; i < 5; i++) {
       slides[i].style.display = "none";
     }
     slideIndex++;
-    if (slideIndex > slides.length) {
+    if (slideIndex > 5) {
       slideIndex = 1;
     }
-    for (i = 0; i < dots.length; i++) {
+    for (i = 0; i < 5; i++) {
       dots[i].className = dots[i].className.replace(" active", "");
     }
     slides[slideIndex - 1].style.display = "block";
@@ -53,5 +69,29 @@
   }
 </script>
 
-{% endblock slider %} {% comment %} style="width:100%" {% endcomment %} 
-{% block elctronics %} {% endblock elctronics %}
+{% endblock slider %} 
+
+{% block elctronics %}
+
+
+{% for key, value in dict2.items %}
+
+
+  <b> Best {{key}} For You</b> <br> <br>
+
+ {% for val in value %}
+
+   <a href="{% url 'product-detail' val.id %}"> <img src=" {{val.image.url}}" alt="" height="300px" width="300px">
+    <b>From Rs.</b>{{val.product.price}}
+  </a>
+  
+
+ {% endfor %} <br> <hr>
+
+
+{% endfor %}
+
+
+{% endblock elctronics %} 
+
+{% comment %} slides.length {% endcomment %}

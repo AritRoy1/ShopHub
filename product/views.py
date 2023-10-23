@@ -188,3 +188,44 @@ def remove_cart(request):
             
         }
     return JsonResponse(data)
+
+def search(request):
+    dict1={}
+    category = Category.objects.all()
+    for item in category:
+        dict1[item.name]=SubCategory.objects.filter(category__name = item.name)
+        
+    if request.method=='GET':
+        
+        if 'search' in request.GET:
+            print("----------------")
+            var = request.GET.get('search')
+            var1 = request.GET.get('test')
+            print("var",var)
+            print("var1",var1)
+            
+            # filter by price
+            if var1=='1':
+                image  = Image.objects.filter(Q(product__sub__name__icontains=var) & Q(product__price__lte=30000)) 
+                return render(request, 'product/search.html', {"image":image, "dict1":dict1, "query":var})
+    
+            elif var1=="2":
+                image  = Image.objects.filter(Q(product__sub__name__icontains=var) & Q(product__price__gte=30000))
+        
+                return render(request, 'product/search.html', {"image":image, "dict1":dict1, "query":var})
+
+            # filter by Brand 
+            
+                        
+        else:        
+            
+            image = Image.objects.all()    
+        
+            return render(request, 'product/search.html', {"image":image, "dict1":dict1,})
+    image = Image.objects.filter(product__sub__name__icontains=var)
+  
+    
+    return render(request, 'product/search.html', {"image":image, "dict1":dict1,'query':var})
+
+    
+

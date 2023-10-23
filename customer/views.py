@@ -12,14 +12,21 @@ from product.models import Category, Image, Product, SubCategory
 
 def home(request):
     category = Category.objects.all()
-    subcatagory = SubCategory.objects.all()
+    subcatagory = SubCategory.objects.all()   
     image = Image.objects.all()
+    # image1 = Image.objects.filter()
+    
     dict1={}
+    dict2={}
     for item in category:
 
         dict1[item.name]=SubCategory.objects.filter(category__name = item.name)    
     
-    return render(request, 'customer/home.html', {'category':category, "dict1":dict1, 'image':image})
+    for sub in subcatagory:
+        dict2[sub.name]=Image.objects.filter(product__sub__name=sub.name)
+    print(dict2)
+    
+    return render(request, 'customer/home.html', {'category':category, "dict1":dict1, "dict2":dict2,  'image':image, 'subactegory':subcatagory})
 
 def CustomerRegistration(request):
     if request.method == "POST":
@@ -28,10 +35,8 @@ def CustomerRegistration(request):
         if form.is_valid(): 
             form.save()
             return HttpResponseRedirect('/login/')
-        
-      
-    else:
-          
+                 
+    else:    
         form = CustomerRegistrationForm()
     return render(request, 'customer/customer.html', {"form":form})
 

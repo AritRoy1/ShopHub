@@ -34,6 +34,8 @@ class Product(CreateDate):
     name = models.CharField(max_length=200)
     description = models.TextField()
     price = models.FloatField()
+    brand = models.CharField(max_length=30, blank=True, null=True)
+    color = models.CharField(max_length=30, blank=True, null=True)
     
     ## relation
     vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE)

@@ -10,7 +10,6 @@ body {
     /* background-color: #333; */
     background-color: blue;
 
-
   }
   
   .topnav a {
@@ -45,6 +44,10 @@ body {
  
   background-color: aqua;
     
+}
+
+.navbar-nav li:hover, .nav-item:hover {
+  background-color: whitesmoke;
 }
 
 /* footer */
