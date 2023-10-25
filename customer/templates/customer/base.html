@@ -91,7 +91,13 @@
           {% comment %} <a class="dropdown-item" href="{% url 'customer-registration' %}">LogIn for Customer</a>
           <a class="dropdown-item" href="{% url 'vendor-registration' %}">LogIn for Vendor</a> {% endcomment %}
           
+          <a class="dropdown-item" href="{% url 'profile' %}">My Profile</a>
+          <a class="dropdown-item" href="{% url 'wishlist' %}">WishList</a>
+          <a class="dropdown-item" href="">Orders</a>
+
+
           <a class="dropdown-item" href="{% url 'logout' %}">LogOut</a>
+
           </div> 
         </li>
          
@@ -161,6 +167,10 @@
 {% block product %}
 
 {% endblock product %}
+
+{% block wishlist %}
+
+{% endblock wishlist %}
 
    {% comment %} footer {% endcomment %}
 

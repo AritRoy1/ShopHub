@@ -189,6 +189,7 @@ def remove_cart(request):
         }
     return JsonResponse(data)
 
+
 def search(request):
     dict1={}
     category = Category.objects.all()
@@ -199,100 +200,68 @@ def search(request):
         print("GET1")
         
         if 'search' in request.GET:
-            print("GET2")
+           
             print("----------------")
-            var = request.GET.get('search')
-            var1 = request.GET.get('test')
-            
-           
-            
-            print("var",var)
-            print("var1",var1)
-           
-            
-            # print(type(var2))
-            
-            brand_item = Product.objects.filter(sub__name__icontains=var).distinct("brand",'color')
-            # print(product)
-            # color = Product.objects.filter(sub__name__icontains)
-            
+            query = request.GET.get('search')
+            test = request.GET.get('test')           
+            print("var",query)
+            print("var1",test)          
+                 
+            brand_item = Product.objects.filter(sub__name__icontains=query).distinct('brand')
+            color_item = Product.objects.filter(sub__name__icontains=query).distinct('color')
             
             # filter by price
-            if var1=='1':
-                image  = Image.objects.filter(Q(product__sub__name__icontains=var) & Q(product__price__lte=30000)) 
-                return render(request, 'product/search.html', {"image":image, "dict1":dict1, "query":var, })
+            if test=='1':
+                image  = Image.objects.filter(Q(product__sub__name__icontains=query) & Q(product__price__lte=30000)) 
+                return render(request, 'product/search.html', {"image":image, "dict1":dict1, "query":query, "brand_item":brand_item, "color_item":color_item})
     
-            elif var1=="2":
-                image  = Image.objects.filter(Q(product__sub__name__icontains=var) & Q(product__price__gte=30000))
+            elif test=="2":
+                image  = Image.objects.filter(Q(product__sub__name__icontains=query) & Q(product__price__gte=30000))
         
-                return render(request, 'product/search.html', {"image":image, "dict1":dict1, "query":var, })
-
-
-            # filter by Brand 
-            # else:
-            #     image = Image.objects.filter(product__brand=var2)
-            #     return render(request, 'product/search.html', {"image":image, "dict1":dict1, "query":var, "product":product})
-
-          
+                return render(request, 'product/search.html', {"image":image, "dict1":dict1, "query":query, "brand_item":brand_item, "color_item":color_item})
+        
     
-        else:        
-            
-            image = Image.objects.all()    
-            print("get3")
-        
+        else:            
+            image = Image.objects.all() 
             return render(request, 'product/search.html', {"image":image, "dict1":dict1,})
                
-               
+        # filter by brand
         if 'brand' in request.GET:
             var2 = request.GET.get('brand')
             image = Image.objects.filter(product__brand=var2)
-            return render(request, 'product/search.html', {"image":image, "dict1":dict1, "query":var, "product":brand_item})
+            return render(request, 'product/search.html', {"image":image, "dict1":dict1, "query":query, "brand_item":brand_item, "color_item":color_item})
+        
+        # filter by color
+        if "color" in request.GET:
+            color = request.GET.get('color')
+            print(color)
+            image = Image.objects.filter(Q(product__sub__name__icontains=query) & Q(product__color__icontains=color))
+            return render(request, 'product/search.html', {"image":image, "dict1":dict1, "query":query, "brand_item":brand_item, "color_item":color_item})
+        
+        # sort
+        if "sort" in request.GET:
+            sort = request.GET.get('sort')
+            print("sort",type(sort))
+            if sort=='1':
+                image = Image.objects.filter(Q(product__sub__name__icontains=query)|Q(product__category__name__icontains=query)).order_by("product__price")
+                
+                return render(request, 'product/search.html', {"image":image, "dict1":dict1, "query":query, "brand_item":brand_item, "color_item":color_item})
+                
+            if sort=='2':
+                image = Image.objects.filter(Q(product__sub__name__icontains=query)| Q (product__category__name__icontains=query)).order_by("-product__price")
+                return render(request, 'product/search.html', {"image":image, "dict1":dict1, "query":query, "brand_item":brand_item, "color_item":color_item})
+                
             
-    image = Image.objects.filter(Q(product__category__name__icontains=var)|Q(product__sub__name__icontains=var))
+    image = Image.objects.filter(Q(product__category__name__icontains=query)|Q(product__sub__name__icontains=query))
     
     
-    if var == "":
-            return render(request, 'product/search.html', {"image":image, "dict1":dict1,'query':var,})
+    if query == "":
+            return render(request, 'product/search.html', {"image":image, "dict1":dict1,'query':query,})
     else: 
-        return render(request, 'product/search.html', {"image":image, "dict1":dict1,'query':var, "product":brand_item})
+        return render(request, 'product/search.html', {"image":image, "dict1":dict1,'query':query, "brand_item":brand_item,"color_item":color_item})
 
     
-  
-  
-  
-        # if 'brand' in request.GET:
-        #     # var = request.GET.get('search')
-        #     var2 = request.GET.get('brand')
-        #     print("second")
-        #     print("var", var)
-        #     print("var2",var2)
-        #     image = Image.objects.filter(product__brand=var2)
-        #     return render(request, 'product/search.html', {"image":image, "dict1":dict1, "query":var, "product":product})
-
-        # else:        
-            
-        #     image = Image.objects.all()    
-        #     print("get3")
-        
-        #     return render(request, 'product/search.html', {"image":image, "dict1":dict1,})
-                       
-                       
-                       
-# def search(request):
-#     if request.method=='GET':
-#         if 'search' in request.GET:
-#            var = request.GET.get('search')
-#            query  = request.GET.get('search')
-#            query = "|".join(query.split(' '))
-#            print(query)
-#            search_query = SearchQuery(query, search_type='raw')
-
-#            books = Image.objects.annotate(
-#             search=SearchVector("product__brand","product__description","product__sub__name", "product__price", "product__brand", "product__category__name")
-#                 ).filter(search=search_query).order_by('product__sub__name')
-        
-           
-        
-#         print(var)
-            
-#     return render(request, 'product/search.html', {"books":books, "query":query} )
+    
+    
+def wishlist(request):
+    return render(request, 'product/wishlist.html')

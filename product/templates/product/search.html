@@ -6,16 +6,20 @@
 {% endblock search-tag %}
 
 {% block search %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'product/css/style2.css' %}">
 
-
-
-<style>
-    .val {
-      border-right: 3px solid black;
-      height: 100%%;
-    }
-    </style>
-
+{% if query %}
+<div class="dropdown mt-3" >
+    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+      Sort by
+    </button>
+    <div class="dropdown-menu">
+      <a class="dropdown-item" href="{% url 'search' %}?sort=1&search={{query}}">Low to High</a>
+      <a class="dropdown-item" href="{% url 'search' %}?sort=2&search={{query}}">High to Low</a>
+    </div>
+  </div> 
+ {% endif %}
   
     <h2 class = "text-center">Search Results for "{{ query }}"</h2>
 
@@ -23,26 +27,25 @@
     <div class="val col-md-3">
         <h1>Filters</h1>  <br>
         <h3>By price</h3> <br>
-        {% comment %} <a href="{% url 'item'  'bellow' query  %}">{{ query }} under 30000</h3></a> <br> <br>
-        <a href="{% url 'item'  'above' query  %}">{{ query }} above 30000</h3></a> {% endcomment %}
-
+       
         <a href="{% url 'search' %}?test=1&search={{query}}">{{ query }} under 30000</h3></a> <br> <br>
         <a href="{% url 'search' %}?test=2&search={{query}}">{{ query }} above 30000</h3></a> <br> <br>
 
         <h3>By Brand</h3> 
-                {% comment %} <a href="{% url 'search' %}?test=2&search={{query}}">{{ query }} </h3></a> <br> <br>
-                <a href="{% url 'search' %}?test=3&search={{query}}">{{ query }} </h3></a> <br> <br> {% endcomment %}
-
+        {% if query %}
+        
         {% for item in brand_item %}
         <a href="{% url 'search' %}?brand={{item.brand}}&search={{query}}"> {{item.brand}} </a> <br>
     
         {% endfor %} <br>
 
         <h3>By color</h3>
-        {% for item in brand_item %}
-        <a href="{% url 'search' %}?brand={{item.brand}}&search={{query}}"> {{item.color}} </a> <br>
+
+        {% for item in color_item %}
+        <a href="{% url 'search' %}?color={{item.color}}&search={{query}}"> {{item.color}} </a> <br>
     
         {% endfor %} <br>
+        {% endif %}
 
     </div>
     

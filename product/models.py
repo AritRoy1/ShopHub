@@ -36,6 +36,7 @@ class Product(CreateDate):
     price = models.FloatField()
     brand = models.CharField(max_length=30, blank=True, null=True)
     color = models.CharField(max_length=30, blank=True, null=True)
+   
     
     ## relation
     vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE)
@@ -82,4 +83,9 @@ class Order(models.Model):
     quantity = models.PositiveIntegerField(default=1)
     order_date = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=30, choices=CHOICES_STATUS, default = "Pending")
+
     
+class Wishlist(models.Model):
+    image = models.ForeignKey(Image, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    Customer = models.ForeignKey(Customer, on_delete=models.CASCADE)

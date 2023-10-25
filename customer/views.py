@@ -119,3 +119,11 @@ class ProductDetail(View):
         return render(request, 'customer/product_detail.html', {"phone":phone,
                 "img":img, 'category':category, 'dict1':dict1})
 
+
+def profile(request):
+    category = Category.objects.all()
+    dict1={}
+    for item in category:
+        dict1[item.name]=SubCategory.objects.filter(category__name = item.name)
+            
+    return render(request, 'customer/profile.html', {"dict1":dict1})
