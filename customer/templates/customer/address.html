@@ -1,0 +1,74 @@
+{% extends "customer/base.html" %} {% block profile %}
+{% load static %}
+<style>
+  .form-display {
+    background-color: whitesmoke;
+  }
+  .ancor{
+   
+        top: 305px;
+        right: 310px;
+        position: absolute;
+   
+  }
+</style>
+
+<div class="row">
+  <div class="col-sm-3 mt-4">{% include 'customer/profile_sidebar.html' %}</div>
+
+  <div class="form-display col-sm-6 mt-4">
+    <h2>Addresses</h2>
+    <div>
+      {% if address %} {% for add in address %}
+      <div class="border border-dark" style="background: lightblue">
+        {{add.name}} {{add.phone_number}} <br />
+        {{add.address}} {{add.locality}} {{add.pincode}} {{add.city}}
+        {{add.state}}
+
+        <a class="ancor" href="{% url 'add-address' %}">
+            <i class="fa fa-plus" style="margin: 3px" aria-hidden="true"></i> Add
+            A New Address
+          </a>
+      </div>
+      
+      <br />
+      {% endfor %} 
+      
+      {% else %}
+      <div class ="text-center">
+      <img src="{% static 'customer/images/empty_address.png' %}" alt="">
+    
+    </div>
+    <h4 class="text-center">
+      No Addresses found in your account! <br>  <br>
+      Add a delivery address. <br> <br>
+    </h4>
+    
+  
+    <a class="ancor" href="{% url 'add-address' %}">
+        <i class="fa fa-plus" style="margin: 3px" aria-hidden="true"></i> Add
+        A New Address
+      </a>
+   
+
+
+      {% endif %} 
+
+      
+    </div>
+  </div>
+</div> <br><br>
+
+{% endblock profile %}
+
+<form action="">
+    {% csrf_token %} {{form.as_p}}
+    <input type="submit" value="Save" class="btn btn-success" />
+  </form>
+
+  <div class="border border-dark" style="color: blue">
+    <a href="{% url 'address' %}">
+      <i class="fa fa-plus" style="margin: 3px" aria-hidden="true"></i> Add
+      A New Address
+    </a>
+  </div>

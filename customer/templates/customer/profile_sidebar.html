@@ -1,0 +1,21 @@
+
+
+{% load static %}
+
+<div class= "border border-primary h-100">
+    <div class="text-center">
+        <img src="{% static 'customer/images/profile.png' %}"alt="profilepic" class= "img-fluid rounded-circle mt-4 " width="100px" height="100px">
+       <h4 class ="mt-2 st-font" >{{request.user.first_name}}</h4>
+        <hr>
+
+    </div>
+    <hr class="border-white">
+    <nav class="nav flex-column text-center">
+    
+        <a href="{% url 'profile' %}" class="nav-link">Profile Information</a>
+        {% comment %} <a href="{% url 'services' %}" class="nav-link">Service</a> {% endcomment %}
+        <a href="{% url 'address' %}" class="nav-link">Manage Address</a> 
+        <a href="{% url 'logout' %}" class="nav-link">Logout</a>
+
+        </nav>
+</div>

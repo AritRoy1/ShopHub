@@ -1,5 +1,5 @@
 from django import forms
-from .models import Customer, Vendor
+from .models import Customer, Vendor, MultipleAddress
 from django.db import models
 from django.contrib.auth.forms import AuthenticationForm, UsernameField, UserCreationForm
 
@@ -29,3 +29,16 @@ class LoginForm(forms.Form):
     password = forms.CharField(widget=forms.PasswordInput)
     
     
+class CustomerProfileForm(forms.ModelForm):
+    class Meta:
+        model = Customer
+        fields = ['first_name', 'last_name', 'email', 'birth_date', 'phone_number', 'city', 'state', 'address']
+        
+        widgets = {'address':forms.Textarea(attrs={'cols':34, 'rows':4})}
+        
+class AddAddressForm(forms.ModelForm):
+    class Meta:
+        model = MultipleAddress
+        fields = ['name', 'phone_number', 'pincode', 'locality', 'address', 'city', 'state', 'landmark']
+        widgets = {'address':forms.Textarea(attrs={'cols':34, 'rows':4})}
+        

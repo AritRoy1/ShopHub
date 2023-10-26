@@ -1,0 +1,26 @@
+{% extends "customer/base.html" %}
+
+{% block add-address %}
+{% load static %}
+
+
+<div class="row">
+    <div class="col-sm-3 mt-4">{% include 'customer/profile_sidebar.html' %}</div>
+  
+    <div class="form-display col-sm-6 mt-4">
+      <h2>Addresses</h2>
+   
+    
+  
+   <form action="" method="POST">
+    {% csrf_token %} {{form.as_p}}
+    <input type="submit" value="Save" class="btn btn-success" />
+  </form>
+</div>
+  
+        
+
+  </div> <br><br>
+  
+
+{% endblock add-address %}
