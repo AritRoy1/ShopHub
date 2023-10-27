@@ -6,9 +6,10 @@ from django.views import View
 from django.contrib.auth import authenticate, login , logout
 from .forms import LoginForm, CustomerProfileForm, AddAddressForm
 from django. contrib import messages
-from product.models import Category, Image, Product, SubCategory
-
-
+from product.models import Category, Image, Product, SubCategory, Wishlist
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
+from django.contrib.auth.decorators import login_required
 
 def home(request):
     category = Category.objects.all()
@@ -108,6 +109,7 @@ class ProductList(View):
 class ProductDetail(View):
     def get(self, request, pk):
         category = Category.objects.all()
+        wishlist = Wishlist.objects.all()
         dict1={}
         for item in category:
             dict1[item.name]=SubCategory.objects.filter(category__name = item.name)
@@ -117,8 +119,10 @@ class ProductDetail(View):
         phone = Product.objects.filter(id=pk)
         
         img = Image.objects.get(pk=pk)
+        print(img.product)
+        # print(wishlist.product)
         return render(request, 'customer/product_detail.html', {"phone":phone,
-                "img":img, 'category':category, 'dict1':dict1})
+                "img":img, 'category':category, 'dict1':dict1, "wishlist":wishlist})
 
 
 class CustomerProfile(View):
@@ -191,8 +195,68 @@ class  AddAddress(View):
             
             return redirect('/address/')
             
-            
+def delete_address(request, pk):
+    address = MultipleAddress(pk=pk)
+    address.delete()
+    return redirect('/address/')  
             
             
 
+# def remove_wishlist_data(request):
+#     if request.method=="GET":
+#         print("ajanta")
+    
+#     if request.method == "POST":
+#         # Your logic to remove data from the backend goes here
+#         # Make sure to handle any authentication/authorization as needed
+#         # For example, you can use request.user to identify the user
+#         # Return a JSON response indicating success or failure
+#         # Example response:
+        
+#         print("jai")
+#         return JsonResponse({"message": "Data removed successfully"})
+#     else:
+#         return JsonResponse({"error": "Invalid request method"}, status=400)
        
+       
+       
+       
+       
+@login_required
+def add_to_wishlist(request, product_id):
+    
+    image = get_object_or_404(Image, id=product_id) 
+    
+    product=Product.objects.get(image__id=product_id)
+  
+    user = Customer.objects.get(username=request.user)
+    
+    
+    i=Wishlist.objects.filter(image=image, product=product, customer=user)
+    print(i)
+
+    
+    if not Wishlist.objects.filter(customer=user, product=product, image=image).exists():
+        wishlist_item = Wishlist(customer=user, product=product, image=image)
+        print("wishitem ", wishlist_item)
+        print("jai mata di")
+        
+        wishlist_item.save()
+        return JsonResponse({'message': 'Item added to wishlist'})
+
+    return JsonResponse({'message': 'Item is already in the wishlist'})
+
+
+@login_required
+def remove_from_wishlist(request, product_id):
+    print("hello")
+    image = get_object_or_404(Image, id=product_id)
+    product=Product.objects.get(image__id=product_id)  
+    user = Customer.objects.get(username=request.user)
+
+    try:
+        wishlist_item = Wishlist.objects.get(customer=user, product=product, image=image)
+        wishlist_item.delete()
+        return JsonResponse({'message': 'Item removed from wishlist'})
+    except Wishlist.DoesNotExist:
+        return JsonResponse({'message': 'Item was not in the wishlist'})

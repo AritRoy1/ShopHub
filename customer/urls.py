@@ -21,6 +21,11 @@ urlpatterns = [
     path("profile/", views.CustomerProfile.as_view(), name="profile"),
     path("address/", views.address, name = 'address'),
     path("add-address/", views.AddAddress.as_view(), name = 'add-address'),
+    path("delete-address/<int:pk>/", views.delete_address, name="delete-address"),
+    # path('remove_wishlist_data/', views.remove_wishlist_data, name = "remove-wishlist"),
+    path('add_to_wishlist/<int:product_id>/', views.add_to_wishlist, name='add_to_wishlist'),
+    path('remove_from_wishlist/<int:product_id>/', views.remove_from_wishlist, name='remove_from_wishlist'),
+
     
     
    

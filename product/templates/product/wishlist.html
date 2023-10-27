@@ -1,4 +1,12 @@
 {% extends "customer/base.html" %}
 {% block wishlist %}
-<h1>My Wishlist</h1>
+
+
+{% for wish in wishlist %}
+<img src="{{wish.image.image.url}}"height="300px" width = "400px" alt="not">
+    {{wish.product.name}}
+
+{% endfor %}
+
+<br><br>
 {% endblock wishlist %}

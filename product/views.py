@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.views import View
 from .forms import ProductForm
 from django.http import HttpResponse , HttpResponseRedirect
-from .models import Product, Cart, Category, SubCategory, Image
+from .models import Product, Cart, Category, SubCategory, Image, Wishlist
 from customer.models import Customer
 from django.db.models import Q
 from django.http import JsonResponse
@@ -264,4 +264,7 @@ def search(request):
     
     
 def wishlist(request):
-    return render(request, 'product/wishlist.html')
+    id = 4
+    wishlist = Wishlist.objects.filter(customer__username = request.user)
+    return render(request, 'product/wishlist.html', {"wishlist":wishlist})
+

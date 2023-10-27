@@ -11,6 +11,9 @@
         position: absolute;
    
   }
+  .font{
+    
+  }
 </style>
 
 <div class="row">
@@ -19,24 +22,29 @@
   <div class="form-display col-sm-6 mt-4">
     <h2>Addresses</h2>
     <div>
-      {% if address %} {% for add in address %}
+      {% if address %}
+      
+      {% for add in address %}
       <div class="border border-dark" style="background: lightblue">
-        {{add.name}} {{add.phone_number}} <br />
-        {{add.address}} {{add.locality}} {{add.pincode}} {{add.city}}
+        {{add.name}} ,{{add.phone_number}} <br />
+        {{add.address}} ,{{add.locality}} ,{{add.pincode}} ,{{add.city}} ,
         {{add.state}}
-
-        <a class="ancor" href="{% url 'add-address' %}">
-            <i class="fa fa-plus" style="margin: 3px" aria-hidden="true"></i> Add
-            A New Address
-          </a>
+      
+      <a href="{% url 'delete-address' add.id %}"> <span class="float-right mb-5 mr-3"> <i class="fa fa-trash" aria-hidden="true"></i> </span></a>
+       
       </div>
       
       <br />
       {% endfor %} 
-      
+      <a class="ancor" href="{% url 'add-address' %}">
+        <i class="fa fa-plus" style="margin: 3px" aria-hidden="true"></i> Add
+        A New Address
+      </a>
+
       {% else %}
       <div class ="text-center">
       <img src="{% static 'customer/images/empty_address.png' %}" alt="">
+
     
     </div>
     <h4 class="text-center">
