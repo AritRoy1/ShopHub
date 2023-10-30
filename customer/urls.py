@@ -9,7 +9,7 @@ urlpatterns = [
     
     
     path('customer/registration/', views.CustomerRegistration, name='customer-registration'),
-    path('vendor/registration/', views.VendorRegistration, name = 'vendor-registration'),
+    # path('vendor/registration/', views.VendorRegistration, name = 'vendor-registration'),
     
     # path('accounts/login', auth_view.LoginView.as_view(template_name="customer/login.html", 
     #         authentication_form=LoginForm), name='login')

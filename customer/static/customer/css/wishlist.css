@@ -1,0 +1,26 @@
+.cont {
+    display: left;
+    margin: 15px;
+    justify-content: space-around;
+  }
+
+  .icon{
+    content: "\f004";
+    display: block;
+    font-size: 31px;   
+  } 
+
+
+
+  .heart-icon {
+    font-size: 24px;
+    color: aqua; 
+
+    transition: blue; 
+
+}
+
+.wishlist-button.added .heart-icon {
+    color: red;
+}
+

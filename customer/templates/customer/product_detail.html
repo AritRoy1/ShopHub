@@ -1,7 +1,7 @@
 {% extends "customer/base.html" %} {% block product-details %} {% load static %}
 
 <style>
-  {% comment %} .cont {
+  .cont {
     display: left;
     margin: 15px;
     justify-content: space-around;
@@ -11,14 +11,12 @@
     content: "\f004";
     display: block;
     font-size: 31px;   
-  } {% endcomment %}
+  } 
 
   .heart-icon {
     font-size: 24px; /* Adjust the size as needed */
-    {% comment %} color: #333; /* Original color of the heart icon */ {% endcomment %}
     color: aqua; /* Original color of the heart icon */
 
-    {% comment %} transition: color 0.3s; /* Smooth color transition */ {% endcomment %}
     transition: blue; /* Smooth color transition */
 
 }
@@ -27,7 +25,7 @@
     color: red;
 }
 </style>
-<h1>Mobile</h1>
+<h1>{{img.product.sub.name}}</h1>
 
 <div class="row ml-3">
   <div class="col-sm-3" style="background-color: lightblue;">
@@ -44,28 +42,10 @@
       </div>
     </form>
 
-   {% comment %} <a href=""> <button type="submit" class="btn btn-info shadow px-5 py-2">wishlist</button></a>
-    {% endcomment %}
-    
-    {% comment %} <div class="wishlist-icon float-right" style="position: relative; top:-447px">
-      <i class="fa fa-heart icon"></i>
-    </div> {% endcomment %}
-
-    {% comment %} <div class="product">
-    <button class="wishlist-button"  data-product-id="{{ img.id }}">❤</button>
-  </div> {% endcomment %}
 
   <div class="product float-right"  style="position: relative; top:-447px">
-    <button class="wishlist-button {% if img.product_in_wishlist %} added {% endif %}"  data-product-id="{{ img.id }}"><i class="fa fa-heart heart-icon"></i></button>
+    <button class="wishlist-button {% if flag %} added {% endif %}"  data-product-id="{{ img.id }}"><i class="fa fa-heart heart-icon"></i></button>
 
-    {% if img.product in wishlist %}
-
-        {{img.product}}
-    {% else %}
-    <h1>kjhgf</h1>
-    {% endif %}
-
-    {{wishlist}}
 
 
   </div>
@@ -80,77 +60,6 @@
   
 </div>
 
-{% comment %} <script>
-
-{% comment %} 
-  document.addEventListener("DOMContentLoaded", function() {
-    const wishlistIcon = document.querySelector(".wishlist-icon");
-    let isRed = false;
-  
-    wishlistIcon.addEventListener("click", function() {
-      if (isRed) {
-        // If the icon is already red, remove the data from the backend
-        removeDataFromBackend();
-      } else {
-        // If the icon is not red, change its color to red
-        wishlistIcon.style.color = "red";
-        isRed = true;
-      }
-    });
-  
-    function removeDataFromBackend() {
-      // Send an AJAX request to Django view to remove data from the backend
-      // You can use libraries like Axios or jQuery for making AJAX requests
-      // Example using fetch:
-      fetch("/remove_wishlist_data/", {
-        method: "POST",
-        headers: {
-          "X-CSRFToken": getCookie("csrftoken"), // Include CSRF token
-        },
-      })
-        .then(response => response.json())
-        .then(data => {
-          // Handle the response from the backend (if needed)
-          console.log("Data removed from backend:", data);
-        })
-        .catch(error => {
-          console.error("Error removing data:", error);
-        });
-    }
-  
-    // Function to get the CSRF token from cookies (for Django)
-    function getCookie(name) {
-      const value = `; ${document.cookie}`;
-      const parts = value.split(`; ${name}=`);
-      if (parts.length === 2) return parts.pop().split(";").shift();
-    }
-  }); {% endcomment %}
-
-{% comment %} 
-  document.querySelectorAll('.wishlist-button').forEach(function(button) {
-    button.addEventListener('click', function() {
-        const productId = this.getAttribute('data-product-id');
-        console.log(productId)
-        const action = this.classList.contains('added') ? 'remove' : 'add';
-        console.log(action)
-
-        fetch(`/add_to_wishlist/${productId}/`, { method: 'GET' })
-        .then(response => response.json())
-        .then(data => {
-            if (data.message === 'Item added to wishlist') {
-                this.classList.add('added');
-            } else if (data.message === 'Item removed from wishlist') {
-                this.classList.remove('added');
-            }
-        });
-        
-    });
-});
-
-</script> {% endcomment %} 
-
-
-
 
 <script>
   document.querySelectorAll('.wishlist-button').forEach(function(button) {
@@ -159,12 +68,10 @@
           const action = this.classList.contains('added') ? 'remove' : 'add';
           console.log(productId)
           console.log(action)
-          // Get the CSRF token from the DOM
+
 
           const csrfToken = getCookie('csrftoken');
           
-
-          // Include the CSRF token in the headers
           const headers = {
               'Content-Type': 'application/json',
               'X-CSRFToken': csrfToken,

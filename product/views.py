@@ -7,6 +7,29 @@ from customer.models import Customer
 from django.db.models import Q
 from django.http import JsonResponse
 from django.contrib.postgres.search import SearchVector, SearchQuery
+from .forms import VendorRegistrationForm
+
+
+
+def VendorRegistration(request):
+    if request.method == "POST":
+        form = VendorRegistrationForm(request.POST, request.FILES)
+        # form = CustomerRegistrationForm(request.POST)
+        if form.is_valid():     
+            form.save()
+            # return HttpResponseRedirect('/product/registration/')
+            return HttpResponseRedirect('/login/')
+             
+    else:        
+        form = VendorRegistrationForm()
+        
+    return render(request, 'product/vendor.html', {"form":form})
+
+
+def vendor_pannel(request):
+    return render(request, 'product/vendor_base.html')
+
+
 class ProductRegistration(View):
     def get(self, request):
         form =ProductForm
@@ -18,21 +41,28 @@ class ProductRegistration(View):
             form.save()
             return HttpResponse("sucessfully Submited")
         
-        
-        
+               
 def add_to_cart(request):
      
     user = request.user
     product_id = request.GET.get('prod_id')
-    image = Image.objects.get(id = product_id)
-    print(image)
+    image = Image.objects.get(id = product_id)  
     product = Product.objects.get(image__id=product_id)  
-    customer = Customer.objects.get(username = user)
+    customer = Customer.objects.get(username = user)   
+    cart = Cart(customer=customer,product=product, image=image) ## 1
+    all_cart = Cart.objects.filter(customer__username=request.user)
+  
+    l1=[]
+    for item in all_cart:
+        l1.append(item.product)
+   
+    if product in l1:
+        return redirect('/product/show-cart')
+    else:
+        cart.save() 
+        return redirect('/product/show-cart') 
     
-    cart = Cart(customer=customer,product=product, image=image)
-    cart.save()    
-    return redirect('/product/cart')
-    
+
 def show_cart(request):
     category = Category.objects.all()
     dict1={}
@@ -64,27 +94,14 @@ def add_cart(request):
     
     if request.method =="GET":
         prod_id = request.GET['prod_id']
-        print(prod_id)
-        
-        user = request.user
-        print(user)
-        
-        customer = Customer.objects.get(username = user)
-        print(customer)
-        
-        
-        
-        c = Cart.objects.get(Q(product__id=prod_id) & Q(customer__username=user))
-        print("c",c)
-        print(c.quantity)
-        
-        c.quantity+=1
-        c.save()
+        user = request.user     
+        customer = Customer.objects.get(username = user)    
+        cart = Cart.objects.get(Q(product__id=prod_id) & Q(customer__username=user))
+        cart.quantity+=1
+        cart.save()
         delivery_charges = 100
         amount =0.0
-        total_amount=0.0
-        
-        
+        total_amount=0.0     
         cart_product = [p for p in Cart.objects.all() if p.customer == customer]
         for p in cart_product:
                 tempamount = (p.quantity * p.product.price)
@@ -96,7 +113,7 @@ def add_cart(request):
                 
                 print("amount",amount)
     data = {
-        "quantity":c.quantity,
+        "quantity":cart.quantity,
         'amount':amount,
         'totalamount':total_amount
             
@@ -107,27 +124,16 @@ def minus_cart(request):
     
     if request.method =="GET":
         prod_id = request.GET['prod_id']
-        print(prod_id)
-        
-        user = request.user
-        print(user)
-        
-        customer = Customer.objects.get(username = user)
-        print(customer)
-        
-        
-        
-        c = Cart.objects.get(Q(product__id=prod_id) & Q(customer__username=user))
-        print("c",c)
-        print(c.quantity)
-        
-        c.quantity-=1
-        c.save()
+        user = request.user 
+        customer = Customer.objects.get(username = user)     
+        cart = Cart.objects.get(Q(product__id=prod_id) & Q(customer__username=user))      
+        cart.quantity-=1
+        if cart.quantity==0:
+            cart.quantity=1
+        cart.save()
         delivery_charges = 100
         amount =0.0
-        total_amount=0.0
-        
-        
+        total_amount=0.0      
         cart_product = [p for p in Cart.objects.all() if p.customer == customer]
         for p in cart_product:
                 tempamount = (p.quantity * p.product.price)
@@ -139,7 +145,7 @@ def minus_cart(request):
                 
                 print("amount",amount)
     data = {
-        "quantity":c.quantity,
+        "quantity":cart.quantity,
         'amount':amount,
         'totalamount':total_amount
             
@@ -151,26 +157,14 @@ def remove_cart(request):
     
     if request.method =="GET":
         prod_id = request.GET['prod_id']
-        print(prod_id)
-        
-        user = request.user
-        print(user)
-        
-        customer = Customer.objects.get(username = user)
-        print(customer)
-        
-        
-        
-        c = Cart.objects.get(Q(product__id=prod_id) & Q(customer__username=user))
-        print("c",c)
-        print(c.quantity)
-        
-        c.delete()
+        user = request.user   
+        customer = Customer.objects.get(username = user)        
+        cart = Cart.objects.get(Q(product__id=prod_id) & Q(customer__username=user))
+     
+        cart.delete()
         delivery_charges = 100
         amount =0.0
-        total_amount=0.0
-        
-        
+        total_amount=0.0    
         cart_product = [p for p in Cart.objects.all() if p.customer == customer]
         for p in cart_product:
                 tempamount = (p.quantity * p.product.price)
@@ -253,8 +247,7 @@ def search(request):
                 
             
     image = Image.objects.filter(Q(product__category__name__icontains=query)|Q(product__sub__name__icontains=query))
-    
-    
+        
     if query == "":
             return render(request, 'product/search.html', {"image":image, "dict1":dict1,'query':query,})
     else: 
@@ -264,7 +257,12 @@ def search(request):
     
     
 def wishlist(request):
-    id = 4
+    ## show all wishlist item 
     wishlist = Wishlist.objects.filter(customer__username = request.user)
     return render(request, 'product/wishlist.html', {"wishlist":wishlist})
+
+def manage_products(request):
+    user = request.user
+    images = Image.objects.filter(product__vendor__username=user)
+    return render(request, 'product/vendor_products.html', {"images":images})
 

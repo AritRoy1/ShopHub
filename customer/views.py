@@ -17,6 +17,7 @@ def home(request):
     image = Image.objects.all()
     # image1 = Image.objects.filter()
     
+    
     dict1={}
     dict2={}
     for item in category:
@@ -41,20 +42,21 @@ def CustomerRegistration(request):
         form = CustomerRegistrationForm()
     return render(request, 'customer/customer.html', {"form":form})
 
-def VendorRegistration(request):
-    if request.method == "POST":
-        form = VendorRegistrationForm(request.POST, request.FILES)
-        # form = CustomerRegistrationForm(request.POST)
-        if form.is_valid():
+
+# def VendorRegistration(request):
+#     if request.method == "POST":
+#         form = VendorRegistrationForm(request.POST, request.FILES)
+#         # form = CustomerRegistrationForm(request.POST)
+#         if form.is_valid():
             
-            form.save()
-            return HttpResponseRedirect('/product/registration/')
+#             form.save()
+#             return HttpResponseRedirect('/product/registration/')
         
       
-    else:
+#     else:
           
-        form = VendorRegistrationForm()
-    return render(request, 'customer/vendor.html', {"form":form})
+#         form = VendorRegistrationForm()
+#     return render(request, 'customer/vendor.html', {"form":form})
 
 
 class Login(View):
@@ -67,17 +69,26 @@ class Login(View):
             username = request.POST["username"]
             password = request.POST["password"]
         
-            User = authenticate(request, username=username, password=password)  
+            user = authenticate(request, username=username, password=password)  
             
-            if User is not None:
-                login(request, User)
-                
-                return HttpResponseRedirect('/home/')      
+            if user is not None:
+                login(request, user)
+                print(request.user)
+                if Vendor.objects.filter(username=request.user):
+                    return HttpResponseRedirect('/product/vendor-pannel/')
+                else:   
+                    return HttpResponseRedirect('/home/')      
             else:
-                messages.info(request, 'username or password is wrong')
+                # messages.info(request, 'username or password is wrong')
+                context={
+                    "form":form,
+                    'message':"username password not match",
+                }
+                return render(request, 'customer/login.html',context)
+                
 
         else :
-          return HttpResponse("dfghjk")
+          return HttpResponse("form not valid")
       
     
 def logout_view(request):
@@ -109,7 +120,11 @@ class ProductList(View):
 class ProductDetail(View):
     def get(self, request, pk):
         category = Category.objects.all()
-        wishlist = Wishlist.objects.all()
+        
+        # wishlist = Wishlist.objects.all()
+        wishlist = Wishlist.objects.filter(customer__username=request.user)
+        
+        print(wishlist)
         dict1={}
         for item in category:
             dict1[item.name]=SubCategory.objects.filter(category__name = item.name)
@@ -119,10 +134,20 @@ class ProductDetail(View):
         phone = Product.objects.filter(id=pk)
         
         img = Image.objects.get(pk=pk)
-        print(img.product)
-        # print(wishlist.product)
+        print("img",img.product)
+        pro=img.product
+        print("pro", pro)
+        l=[]
+        for i in wishlist:
+            l.append(i.product)
+        flag= False
+        if pro in l:
+            flag= True
+        else:
+            flag = False
+        
         return render(request, 'customer/product_detail.html', {"phone":phone,
-                "img":img, 'category':category, 'dict1':dict1, "wishlist":wishlist})
+                "img":img, 'category':category, 'dict1':dict1, "flag":flag})
 
 
 class CustomerProfile(View):
@@ -142,19 +167,17 @@ class CustomerProfile(View):
     def post(self, request):
         form = CustomerProfileForm(request.POST, instance=request.user.customer)
         
-        print("jjjj ")
+        
         if form.is_valid():
-            print("XXXXXX")
+            
             form.save()
             return redirect('/profile/')
     
-        # return render(request, 'customer/profile.html', {"dict1":self.dict1})
-
 
 def address(request):
-        print(request.user)
+        
         address = MultipleAddress.objects.filter(customer__username = request.user) 
-        print(address) 
+       
         if address:   
              return render(request, 'customer/address.html', {'address':address} )
          
@@ -171,11 +194,9 @@ class  AddAddress(View):
         return render(request, 'customer/add_address.html', {'form':form})
        
     def post(self , request):
-        print("kjhgf")
-        user = request.user
-        print(user)
-        form = AddAddressForm(request.POST)
-        print(form)
+       
+        user = request.user    
+        form = AddAddressForm(request.POST)   
   
         if form.is_valid():
             name = form.cleaned_data['name']
@@ -200,27 +221,7 @@ def delete_address(request, pk):
     address.delete()
     return redirect('/address/')  
             
-            
-
-# def remove_wishlist_data(request):
-#     if request.method=="GET":
-#         print("ajanta")
-    
-#     if request.method == "POST":
-#         # Your logic to remove data from the backend goes here
-#         # Make sure to handle any authentication/authorization as needed
-#         # For example, you can use request.user to identify the user
-#         # Return a JSON response indicating success or failure
-#         # Example response:
-        
-#         print("jai")
-#         return JsonResponse({"message": "Data removed successfully"})
-#     else:
-#         return JsonResponse({"error": "Invalid request method"}, status=400)
-       
-       
-       
-       
+                  
        
 @login_required
 def add_to_wishlist(request, product_id):
