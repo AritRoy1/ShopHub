@@ -7,6 +7,9 @@ urlpatterns = [
     path("registration/", views.ProductRegistration.as_view(), name="product-registration"),
     path('vendor-pannel/', views.vendor_pannel, name = 'vendor-pannel'),
     path('manage-product/', views.manage_products, name='manage-products'),
+    path('delete-product/<int:pk>/<int:val>/', views.delete_product_view,name='delete-product'),
+    path('update-product/<int:pk>/<int:val>/', views.update_product_view,name='update-product'),
+    path('add-product', views.addProducts, name='add-product'),
     
     path('add-to-cart/', views.add_to_cart, name = 'add-to-cart'),
     path('show-cart/', views.show_cart, name = 'showcart'),

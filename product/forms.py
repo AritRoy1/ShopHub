@@ -3,10 +3,10 @@ from .models import Product
 from django.contrib.auth.forms import AuthenticationForm, UsernameField, UserCreationForm
 from customer.models import Vendor
 
-class ProductForm(forms.ModelForm):
+class ProductUpdateForm(forms.ModelForm):
     class Meta:
         model = Product
-        fields = "__all__"
+        fields = ['name', 'description', 'price', 'brand', 'color']
 
 
 
@@ -18,3 +18,7 @@ class VendorRegistrationForm(UserCreationForm):
                   , 'gst_invoice']
         widgets = {'address':forms.Textarea(attrs={'cols':34, 'rows':4})}
         
+class ProductAddForm(forms.ModelForm):
+    class Meta:
+        model = Product
+        fields = ['name', 'description', 'price', 'brand', 'color', 'category', 'sub']

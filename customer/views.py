@@ -42,53 +42,91 @@ def CustomerRegistration(request):
         form = CustomerRegistrationForm()
     return render(request, 'customer/customer.html', {"form":form})
 
+## working login form 
 
-# def VendorRegistration(request):
-#     if request.method == "POST":
-#         form = VendorRegistrationForm(request.POST, request.FILES)
-#         # form = CustomerRegistrationForm(request.POST)
+# class Login(View):
+#     def get(self, request):    
+#         form =LoginForm
+#         return render(request, 'customer/login.html', {"form":form})
+#     def post(self, request):     
+#         form =LoginForm(request.POST)      
 #         if form.is_valid():
+#             username = request.POST["username"]
+#             password = request.POST["password"]    
+#             user = authenticate(request, username=username, password=password)  
             
-#             form.save()
-#             return HttpResponseRedirect('/product/registration/')
-        
-      
-#     else:
-          
-#         form = VendorRegistrationForm()
-#     return render(request, 'customer/vendor.html', {"form":form})
+#             if user is not None:
+#                 login(request, user)
+#                 print(request.user)
+#                 if Vendor.objects.filter(username=request.user):
+#                     return HttpResponseRedirect('/product/vendor-pannel/')
+#                 else:   
+#                     return HttpResponseRedirect('/home/')      
+#             else:
+#                 # messages.info(request, 'username or password is wrong')
+#                 context={
+#                     "form":form,
+#                     'message':"username password not match",
+#                 }
+#                 return render(request, 'customer/login.html',context)
+                
 
+#         else :
+#           return HttpResponse("form not valid")
 
+    ##--------------->>>>>>>>>>>>>>>
+    
 class Login(View):
-    def get(self, request):
+    def get(self, request):    
         form =LoginForm
         return render(request, 'customer/login.html', {"form":form})
-    def post(self, request):
-        form =LoginForm(request.POST)      
-        if form.is_valid():
-            username = request.POST["username"]
-            password = request.POST["password"]
-        
-            user = authenticate(request, username=username, password=password)  
-            
-            if user is not None:
+    def post(self, request):     
+        print("sum")
+        username = request.POST.get('username')
+        print(username)
+        password = request.POST.get('password')
+        user = authenticate(request, username=username, password=password) 
+        if user is not None:
                 login(request, user)
                 print(request.user)
                 if Vendor.objects.filter(username=request.user):
                     return HttpResponseRedirect('/product/vendor-pannel/')
                 else:   
                     return HttpResponseRedirect('/home/')      
-            else:
-                # messages.info(request, 'username or password is wrong')
-                context={
-                    "form":form,
+        else:
+            # messages.info(request, 'username or password is wrong')
+            context={
+                
                     'message':"username password not match",
                 }
-                return render(request, 'customer/login.html',context)
+            return render(request, 'customer/login.html',context)
+        
+                
+        # form =LoginForm(request.POST)      
+        # if form.is_valid():
+        #     username = request.POST["username"]
+        #     password = request.POST["password"]    
+        #     user = authenticate(request, username=username, password=password)  
+            
+        #     if user is not None:
+        #         login(request, user)
+        #         print(request.user)
+        #         if Vendor.objects.filter(username=request.user):
+        #             return HttpResponseRedirect('/product/vendor-pannel/')
+        #         else:   
+        #             return HttpResponseRedirect('/home/')      
+        #     else:
+        #         # messages.info(request, 'username or password is wrong')
+        #         context={
+        #             "form":form,
+        #             'message':"username password not match",
+        #         }
+        #         return render(request, 'customer/login.html',context)
                 
 
-        else :
-          return HttpResponse("form not valid")
+        # else :
+        #   return HttpResponse("form not valid")
+      
       
     
 def logout_view(request):

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+{% comment %} <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -27,4 +27,43 @@
       <input type="submit" value="LOGIN" />
     </form>
   </body>
+</html> {% endcomment %}
+
+
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LogIn</title>
+  <link rel="stylesheet" href="{% static 'customer/css/login.css' %}">
+</head>
+<body>
+  <div class="login-box">
+    <h2>Login</h2>
+    <form action="" method="POST" novalidate>
+      {% csrf_token %}
+      <div class="user-box">
+        <input type="text" name="username" required="True">
+        <label>Username</label>
+      </div>
+      <div class="user-box">
+        <input type="password" name="password" required="True">
+        <label>Password</label>
+      </div>
+       {% comment %} <a href="#">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        Submit
+      </a>  {% endcomment %}
+      <small class="message"> {{message}} </small> <br>
+    <a href=""><input type="submit" value="Submit">  </a> 
+     
+    </form>
+  </div>
+  
+</body>
 </html>

@@ -1,13 +1,14 @@
 from django.shortcuts import render, redirect
 from django.views import View
-from .forms import ProductForm
+from .forms import ProductUpdateForm, ProductAddForm, VendorRegistrationForm
 from django.http import HttpResponse , HttpResponseRedirect
 from .models import Product, Cart, Category, SubCategory, Image, Wishlist
-from customer.models import Customer
+from customer.models import Customer, Vendor
 from django.db.models import Q
 from django.http import JsonResponse
 from django.contrib.postgres.search import SearchVector, SearchQuery
-from .forms import VendorRegistrationForm
+
+from django.contrib.auth.decorators import login_required 
 
 
 
@@ -32,11 +33,11 @@ def vendor_pannel(request):
 
 class ProductRegistration(View):
     def get(self, request):
-        form =ProductForm
+        form =ProductUpdateForm
         return render(request, 'product/product.html', {"form":form})
     
     def post(self, request):
-        form =ProductForm(request.POST, request.FILES)
+        form =ProductUpdateForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
             return HttpResponse("sucessfully Submited")
@@ -266,3 +267,64 @@ def manage_products(request):
     images = Image.objects.filter(product__vendor__username=user)
     return render(request, 'product/vendor_products.html', {"images":images})
 
+# @login_required(login_url='login')
+# def update_product_view(request,pk):
+#     product=Product.objects.get(id=pk)
+#     productForm=ProductForm(instance=product)
+#     if request.method=='POST':
+#         productForm=ProductForm(request.POST,request.FILES,instance=product)
+#         if productForm.is_valid():
+#             productForm.save()
+#             return redirect('vendor-products')
+#     return render(request,'product/vendor_update_product.html',{'productForm':productForm})
+
+
+@login_required(login_url='login')
+def update_product_view(request,pk, val):
+    image = Image.objects.get(id=val)
+    product = Product.objects.get(id=pk)    
+    productForm=ProductUpdateForm(instance=product)
+    if request.method=='POST':
+        productForm=ProductUpdateForm(request.POST,request.FILES, instance=product)      
+        if productForm.is_valid():
+            productForm.save()
+            if request.FILES:
+                file =request.FILES['product_image']
+                image.image = file
+                image.save()          
+            return redirect('manage-products')       
+    return render(request,'product/vendor_update_product.html',{'productForm':productForm, 'img':image})
+
+@login_required(login_url='login')
+def delete_product_view(request,pk, val):
+    product=Product.objects.get(id=pk)
+    img = Image.objects.get(id=val)
+    img.delete()
+    product.delete()
+    return redirect('manage-products')
+
+def addProducts(request):
+    productForm=ProductAddForm()
+    # img = Image.objects.get()
+    if request.method=='POST':
+        productForm=ProductAddForm(request.POST, request.FILES)
+        if productForm.is_valid():
+            
+            name = productForm.cleaned_data['name']
+            description = productForm.cleaned_data['description']
+            price = productForm.cleaned_data['price']
+            brand = productForm.cleaned_data['brand']
+            color = productForm.cleaned_data['color']
+            category = productForm.cleaned_data['category']
+            sub = productForm.cleaned_data['sub']
+            
+            vendor = Vendor.objects.get(username=request.user)
+            product = Product(name=name,description=description, price=price,brand=brand, color=color,category=category, sub=sub, vendor=vendor)
+            product.save()
+            
+    
+            files =request.FILES['file']
+            Image.objects.create(product = product, image=files)
+            # productForm.save()
+            return redirect('manage-products')
+    return render(request,'product/vendor_add_products.html',{'productForm':productForm})

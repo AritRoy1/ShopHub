@@ -39,10 +39,6 @@
 }
   </style>
 </head>
-<!--
-written By : sumit kumar
-facebook : fb.com/sumit.luv
--->
 
 
 <div class="container">
@@ -69,11 +65,8 @@ facebook : fb.com/sumit.luv
         <td> <img src="{{ img.image.url }}" alt="Profile Pic" height="40px" width="40px" /></td>
         <td>{{img.product.price}}</td>
         <td>{{img.product.description}}</td>
-       
-
-
-        <td><a class="btn btn-primary btn-xs" href="{% url 'update-product' img.product.id  %}"><span class="glyphicon glyphicon-edit"></span></a>
-          <a class="btn btn-danger btn-xs" href="{% url 'delete-product' img.product.id  %}"><span class="glyphicon glyphicon-trash"></span></a></td> 
+        <td style="display:ruby;"><a class="btn btn-primary btn-xs"  href="{% url 'update-product' img.product.id img.id %}"><span class="glyphicon glyphicon-edit"></span></a>
+          <a class="btn btn-danger btn-xs" href="{% url 'delete-product' img.product.id img.id  %}"><span class="glyphicon glyphicon-trash"></span></a></td> 
 
       </tr>
       {%else%}
@@ -85,10 +78,8 @@ facebook : fb.com/sumit.luv
   </div>
 </div>
 <!-- add product floating button -->
-<a href="/admin-add-product" class="float">
+<a href="{% url "add-product" %}" class="float">
 <i class="fa fa-plus my-float"></i>
 </a>
-<!--
-developed By : sumit kumar
--->
+
 {% endblock content %}
