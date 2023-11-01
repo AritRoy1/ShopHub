@@ -73,8 +73,7 @@ CHOICES_STATUS = [
     ('Out for Delevery','Out for Delevery'),
     ('Delivered','Delivered'),
     ('Cancel','Cancel'),
-    ("Pending","Pending")
-    
+    ("Pending","Pending")    
 ]
 class Order(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)

@@ -10,7 +10,7 @@ from product.models import Category, Image, Product, SubCategory, Wishlist
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.decorators import login_required
-
+from ShopHub import settings
 def home(request):
     category = Category.objects.all()
     subcatagory = SubCategory.objects.all()   
@@ -100,34 +100,7 @@ class Login(View):
                     'message':"username password not match",
                 }
             return render(request, 'customer/login.html',context)
-        
-                
-        # form =LoginForm(request.POST)      
-        # if form.is_valid():
-        #     username = request.POST["username"]
-        #     password = request.POST["password"]    
-        #     user = authenticate(request, username=username, password=password)  
-            
-        #     if user is not None:
-        #         login(request, user)
-        #         print(request.user)
-        #         if Vendor.objects.filter(username=request.user):
-        #             return HttpResponseRedirect('/product/vendor-pannel/')
-        #         else:   
-        #             return HttpResponseRedirect('/home/')      
-        #     else:
-        #         # messages.info(request, 'username or password is wrong')
-        #         context={
-        #             "form":form,
-        #             'message':"username password not match",
-        #         }
-        #         return render(request, 'customer/login.html',context)
-                
-
-        # else :
-        #   return HttpResponse("form not valid")
-      
-      
+              
     
 def logout_view(request):
     logout(request)
@@ -184,8 +157,11 @@ class ProductDetail(View):
         else:
             flag = False
         
+        stripe_publishable_key = settings.STRIPE_PUBLISHABLE_KEY
+        
+        
         return render(request, 'customer/product_detail.html', {"phone":phone,
-                "img":img, 'category':category, 'dict1':dict1, "flag":flag})
+                "img":img, 'category':category, 'dict1':dict1, "flag":flag, "stripe_publishable_key":stripe_publishable_key})
 
 
 class CustomerProfile(View):

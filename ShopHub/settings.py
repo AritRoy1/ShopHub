@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'customer', 
     'product',
+    
+    'payment',
     'widget_tweaks',
 ]
 
@@ -137,4 +139,8 @@ MEDIA_URL = "/media/"
 
 AUTH_USER_MODEL = 'customer.User'
 
-# LOGIN_REDIRECT_URL = ''
+## stripe key for payment interface
+
+if DEBUG:
+    STRIPE_PUBLISHABLE_KEY = 'pk_test_51O7YL4SGxHVPIDmncIeC8vJ70xgUQshpLP5t5GueQYpGJMxiSpV7sqRzvAEvQBRr1KvKQySmQm2LF176v1Fyae2700hk3l1i2W'
+    STRIPE_SECRET_KEY = 'sk_test_51O7YL4SGxHVPIDmnKQE8W0m37a4RergVxdNcyZafecuk6MHL9lvU0jGvcCK7WVS2LtzgqLUNGMsK9Lgk8m1kp2lD002wjIhDH7'

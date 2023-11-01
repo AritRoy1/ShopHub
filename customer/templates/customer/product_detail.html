@@ -36,12 +36,14 @@
         <div class="cont">
         <input type="hidden" name="prod_id" value="{{img.id}}" id="prod_id">
         <button type="submit" class="btn btn-warning shadow px-5 py-2">Add To Cart</button>
-        <button type="submit" class="btn btn-info shadow px-5 py-2">Buy Now</button>
+        {% comment %} <button type="submit" class="btn btn-info shadow px-5 py-2" id="checkout-button" >Buy Now</button> {% endcomment %}
         
         
       </div>
     </form>
+    <button type="submit" class="btn btn-info shadow px-5 py-2" id="checkout-button" >Buy Now</button>
 
+    
 
   <div class="product float-right"  style="position: relative; top:-447px">
     <button class="wishlist-button {% if flag %} added {% endif %}"  data-product-id="{{ img.id }}"><i class="fa fa-heart heart-icon"></i></button>
@@ -57,7 +59,13 @@
     <b> Rs. {{img.product.price}} </b> <br />
     {{img.product.description}}
   </div>
-  
+
+ <div class="form-group">
+    <label for="email">Email: </label>
+    <input type="email" name="email" id="email" class="form-control" placeholder="Email">
+    {% comment %} <small>Please enter your email address</small> {% endcomment %}
+</div>
+
 </div>
 
 
@@ -102,6 +110,47 @@
       const parts = value.split(`; ${name}=`);
       if (parts.length === 2) return parts.pop().split(';').shift();
   }
+  
+</script>
+
+{% comment %} payment scripts {% endcomment %}
+
+<script src="https://js.stripe.com/v3/"></script>
+<script type="text/javascript">
+    // Create an instance of the Stripe object with your publishable API key
+    var stripe = Stripe('{{ stripe_publishable_key }}');
+    var checkoutButton = document.getElementById('checkout-button');
+    
+
+    checkoutButton.addEventListener('click', function () {
+
+    
+        // Create a new Checkout Session using the server-side endpoint you
+        // created in step 3.
+        fetch("{% url 'api_checkout_session' id=img.product.id %}", {
+            method: 'POST',
+            body: JSON.stringify(
+                { email: email }
+            )
+        })
+            .then(function (response) {
+                return response.json();
+            })
+            .then(function (session) {
+                return stripe.redirectToCheckout({ sessionId: session.sessionId });
+            })
+            .then(function (result) {
+                // If `redirectToCheckout` fails due to a browser or network
+                // error, you should display the localized error message to your
+                // customer using `error.message`.
+                if (result.error) {
+                    alert(result.error.message);
+                }
+            })
+            .catch(function (error) {
+                console.error('Error:', error);
+            });
+    });
 </script>
 
 
