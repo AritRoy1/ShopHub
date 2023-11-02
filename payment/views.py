@@ -10,6 +10,8 @@ import stripe
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 import json
+from product.models import Image
+from customer.models import Customer
 
 # Create your views here.
 
@@ -17,6 +19,7 @@ import json
 def create_checkout_session(request, id):
     request_data = json.loads(request.body)
     product = get_object_or_404(Product, pk=id)
+    customer  = get_object_or_404(Customer, username=request.user)
 
     print(id)
     print("jai")
@@ -35,7 +38,7 @@ def create_checkout_session(request, id):
                     'product_data': {
                     'name': product.name,
                     },
-                    'unit_amount': int(product.price),
+                    'unit_amount': int(product.price*100),
                 },
                 'quantity': 1,
             }
@@ -51,14 +54,20 @@ def create_checkout_session(request, id):
     #     customer_email=email,
     #     product=product, ......
     # )
+    
+    print("checout session")
+    
+    print()
+    print(checkout_session)
 
     order = OrderDetail()
-    order.customer_email = request_data['email']
-    
+    # order.customer_email = request_data['email']
+    order.customer = customer
     order.product = product
-    # order.stripe_payment_intent = checkout_session['']  
-    order.amount = int(product.price * 100)  
+    order.session_id = checkout_session['id']  
+    order.amount = int(product.price)  
     order.save()
+    
     print("lkjhgfgh")
 
     # return JsonResponse({'data': checkout_session})
@@ -77,8 +86,9 @@ class PaymentSuccessView(TemplateView):
         
         stripe.api_key = settings.STRIPE_SECRET_KEY
         session = stripe.checkout.Session.retrieve(session_id)
+        print('session', session)
 
-        order = get_object_or_404(OrderDetail)
+        order = get_object_or_404(OrderDetail,session_id = session.id)
         order.has_paid = True
         order.save()
         return render(request, self.template_name)
@@ -90,3 +100,15 @@ class PaymentFailedView(TemplateView):
 class OrderHistoryListView(ListView):
     model = OrderDetail
     template_name = "payments/order_history.html"
+    
+class TrackDetailView(DetailView):
+    
+    print("jhhgf")
+    model = Product
+    template_name = "payments/track_detail.html"
+    def get_context_data(self, **kwargs,):
+        pk=self.kwargs.get('pk')
+        context = super(TrackDetailView, self).get_context_data(**kwargs)
+        context['image'] = Image.objects.get(product__id = pk)
+        return context
+    

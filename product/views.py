@@ -9,6 +9,7 @@ from django.http import JsonResponse
 from django.contrib.postgres.search import SearchVector, SearchQuery
 
 from django.contrib.auth.decorators import login_required 
+from payment.models import OrderDetail
 
 
 
@@ -328,3 +329,15 @@ def addProducts(request):
             # productForm.save()
             return redirect('manage-products')
     return render(request,'product/vendor_add_products.html',{'productForm':productForm})
+
+
+def view_Order(request):
+    order = OrderDetail.objects.all()
+    image = Image.objects.all()
+    context ={
+        'order':order,
+        'image':image,
+    }
+    
+    return render(request, 'product/vendor_looking_order.html', context)
+    

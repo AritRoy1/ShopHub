@@ -5,5 +5,5 @@ from .models import *
 
 @admin.register(OrderDetail)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ['id', 'product','has_paid', 'status', 'updated_on']
+    list_display = ['id','customer', 'product','has_paid', 'status', 'order_date', 'updated_on']
     

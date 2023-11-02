@@ -1,12 +1,45 @@
-{% extends 'payments/base.html' %}
+{% extends 'customer/base.html' %}
 
 {% block content %}
-<h1 class="text-center">Product Detail</h1>
+
+<h1 class="text-center">Track Product</h1>
 <div class="container">
 
     <div class="card">
         <div class="card-header">
             <h2>Product Detail</h2>
+        </div>
+        <div class="card-body">
+            <div class="container row">
+                <div class="col-md-2">
+                    <img src="{{image.image.url}}" alt="" height='200px' width='150px'>
+                </div>
+                <div class="col-md-10">
+                    <h1>Name: {{ object.name}}</h1>
+                    
+                   <b> <p>Price: {{ object.price }}</p> </b>
+
+                  
+                </div>
+            </div>
+        </div>
+
+  
+       
+
+        </div>
+    </div> <br><br><br> <br>
+
+
+
+
+{% comment %} 
+<h1 class="text-center">Track Detail</h1>
+<div class="container">
+
+    <div class="card">
+        <div class="card-header">
+            <h2>Track Detail</h2>
         </div>
         <div class="card-body">
             <div class="container row">
@@ -73,5 +106,5 @@
                 console.error('Error:', error);
             });
     });
-</script>
+</script> {% endcomment %}
 {% endblock content %}

@@ -92,7 +92,7 @@
       <div class="collapse navbar-collapse justify-content-between" id="navbarCollapse">
         <div class="navbar-nav">
           {% comment %} <a href="/view-customer" class="nav-item nav-link">Customer</a> {% endcomment %}
-          <a href="/admin-view-booking" class="nav-item nav-link">View Orders</a>
+          <a href="{% url 'view-order' %}" class="nav-item nav-link">View Orders</a>
           <a href="{% url 'manage-products' %}" class="nav-item nav-link">Manage Products</a>
           <!-- <a href="/view-feedback" class="nav-item nav-link">Feedback</a> -->
         </div>

@@ -1,4 +1,4 @@
-{% extends 'payments/base.html' %}
+{% extends 'customer/base.html' %}
 
 {% block content %}
     <h1 class="text-center">Order History</h1>
@@ -9,18 +9,21 @@
             <thead>
                 <tr>
                     <th>Product</th>
-                    <th>Customer Email</th>
+                    
                     <th>Amount</th>
                     <th>Status</th>
                     <th>Date</th>
+                    <th>Track product</th>
                 </tr>
             </thead>
             <tbody>
                 
                 {% for i in object_list %}
+                
+               
                     <tr>
                         <td>{{ i.product.name }}</td>
-                        <td>{{ i.customer_email }}</td>
+                        
                         <td>{{ i.amount }}</td>
                         <td>
                             {% if i.has_paid %}
@@ -29,7 +32,15 @@
                                 <b class="text-danger">Failed</b>
                             {% endif %}
                         </td>
-                        <td>{{ i.created_on }}</td>
+                        <td>{{ i.order_date }}</td>
+                        <td>
+                            {% if i.has_paid %}
+                               <a href="{% url 'track-product' i.product.id %}"> <b class="text-primary">Track</b> </a>
+                            {% else %}
+                                <b class="text-danger">Payment Failed</b>
+                            {% endif %}
+                        </td>
+                        
                     </tr>
                 {% endfor %}
                     
@@ -41,5 +52,5 @@
         </div>
         {% endif %}
             
-    </div>
+    </div> <br><br><br>
 {% endblock content %}
