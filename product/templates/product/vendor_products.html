@@ -1,5 +1,7 @@
 {% extends 'product/vendor_base.html' %}
 {% load static %}
+
+{% if approved.has_approved %}
 {% block content %}
 
 
@@ -83,3 +85,6 @@
 </a>
 
 {% endblock content %}
+{% else %}
+<h1>waiting for approvel</h1>
+{% endif %}

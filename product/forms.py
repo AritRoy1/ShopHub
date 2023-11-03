@@ -2,6 +2,7 @@ from django import forms
 from .models import Product
 from django.contrib.auth.forms import AuthenticationForm, UsernameField, UserCreationForm
 from customer.models import Vendor
+from payment.models import OrderDetail
 
 class ProductUpdateForm(forms.ModelForm):
     class Meta:
@@ -22,3 +23,8 @@ class ProductAddForm(forms.ModelForm):
     class Meta:
         model = Product
         fields = ['name', 'description', 'price', 'brand', 'color', 'category', 'sub']
+        
+class UpdateOrderForm(forms.ModelForm):
+    class Meta:
+        model = OrderDetail
+        fields = ['status']

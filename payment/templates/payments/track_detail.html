@@ -1,7 +1,181 @@
 {% extends 'customer/base.html' %}
 
-{% block content %}
+{% load static %}
+{% block content %}<style>
+    body {
+        letter-spacing: 0.8px;
+        background: linear-gradient(0deg , #fff , 50% , #74a0ff);
+        {% comment %} background-repeat: no-repeat;     {% endcomment %}
+    }
+    
+    .container-fluid {
+        margin-top: 80px !important;
+        margin-bottom: 80px !important;
+    }
+    
+    p {
+        font-size: 14px;
+        margin-bottom: 7px;
+    }
+    
+    .cursor-pointer {
+        cursor: pointer;
+    }
+    
+    a{
+        text-decoration: none !important;
+        color: #651FFF !important;
+    }
+    
+    .bold{
+        font-weight: 600;
+    }
+    
+    .small{
+        font-size: 12px !important;
+        letter-spacing: 0.5px !important;
+    }
+    
+    .Today{
+        color: rgb(83, 83, 83);
+    }
+    
+    .btn-outline-primary{
+        background-color: #fff !important;
+        color:#4bb8a9 !important;
+        border:1.3px solid #4bb8a9;
+        font-size: 12px;
+        border-radius: 0.4em !important;
+    }
+    
+    .btn-outline-primary:hover{
+        background-color:#4bb8a9  !important;
+        color:#fff !important;
+        border:1.3px solid #4bb8a9;
+    }
+    
+    .btn-outline-primary:focus,
+    .btn-outline-primary:active {
+        outline: none !important;
+        box-shadow: none !important;
+        border-color: #42A5F5 !important;
+    }
+     
+    #progressbar {
+        margin-bottom: 30px;
+        overflow: hidden;
+        color: #455A64;
+        padding-left: 0px;
+        margin-top: 30px
+    }
+    
+    #progressbar li {
+        list-style-type: none;
+        font-size: 13px;
+        width: 33.33%;
+        float: left;
+        position: relative;
+        font-weight: 400;
+        color: #455A64 !important;
+        
+    }
+    
+    #progressbar #step1:before {
+        content: "1";
+        color: #fff;
+        width: 29px;
+        margin-left: 15px !important;
+        padding-left: 11px !important;
+    }
+    
+    
+    #progressbar #step2:before {
+        content: "2";
+        color: #fff;
+        width: 29px;
+    
+    }
+    
+    #progressbar #step3:before {
+        content: "3";
+        color: #fff;
+        width: 29px;
+        margin-right: 15px !important;
+        padding-right: 11px !important;
+    }
+    
+    #progressbar li:before {
+        line-height: 29px;
+        display: block;
+        font-size: 12px;
+        background: #455A64 ;
+        border-radius: 50%;
+        margin: auto;
+    }
+    
+     #progressbar li:after {
+        content: '';
+        width: 121%;
+        height: 2px;
+        background: #455A64;
+        position: absolute;
+        left: 0%;
+        right: 0%;
+        top: 15px;
+        z-index: -1;
+    } 
+    
+    #progressbar li:nth-child(2):after {
+        left: 50%;
+    }
+    
+    #progressbar li:nth-child(1):after {
+        left: 25%;
+        width: 121%;
+    }
+    #progressbar li:nth-child(3):after {
+        left: 25% !important;
+        width: 50% !important;
+    }
+    
+    #progressbar li.active:before,
+    #progressbar li.active:after {
+        background: #4bb8a9; 
+    }
+    
+    .card {
+        background-color: #fff ;
+        box-shadow: 2px 4px 15px 0px rgb(0, 108, 170);
+        z-index: 0;
+    }
+    
+    small{
+        font-size: 12px !important;
+    }
+    
+    .a {
+        justify-content: space-between !important;
+    }
+    
+    .border-line {
+        border-right: 1px solid rgb(226, 206, 226)
+    }
+    
+    .card-footer img{
+        opacity: 0.3;
+    }
+    
+    .card-footer h5{
+        font-size: 1.1em;
+        color: #8C9EFF;
+        cursor: pointer;
+    }
 
+    
+</style>
+
+
+{% comment %} 
 <h1 class="text-center">Track Product</h1>
 <div class="container">
 
@@ -21,90 +195,78 @@
 
                   
                 </div>
+                
             </div>
         </div>
 
-  
-       
-
         </div>
-    </div> <br><br><br> <br>
+    </div> <br><br><br> <br> {% endcomment %}
 
 
-
-
-{% comment %} 
-<h1 class="text-center">Track Detail</h1>
-<div class="container">
-
-    <div class="card">
-        <div class="card-header">
-            <h2>Track Detail</h2>
-        </div>
-        <div class="card-body">
-            <div class="container row">
-                <div class="col-md-2">
-                    <img src="https://dummyimage.com/150x150.gif?text={{ object.name }}" alt="">
-                </div>
-                <div class="col-md-10">
-                    <h1>Name: {{ object.name }}</h1>
-                    <p>Description: {{ object.description }}</p>
-                    <p>Price: {{ object.price }}</p>
-
-                    <div class="form-group">
-                        <label for="email">Email: </label>
-                        <input type="email" name="email" id="email" class="form-control" placeholder="Email">
-                        <small>Please enter your email address</small>
+    <div class="container-fluid my-5 d-sm-flex justify-content-center">
+        <div class="card px-2">
+            <div class="card-header bg-white">
+              <div class="row justify-content-between">
+                <div class="col">
+                    <p class="text-muted" style="display:none;"> Order ID  <span class="font-weight-bold text-dark">1222528743</span></p> 
+                    <p class="text-muted" style="display:none;"> Place On <span class="font-weight-bold text-dark">12,March 2019</span> </p></div>
+                    <div class="flex-col my-auto">
+                        <h6 class="ml-auto mr-3">
+                            <a href="#">View Details</a>
+                        </h6>
                     </div>
+              </div>
+            </div>
+            <div class="card-body">
+                <div class="media flex-column flex-sm-row">
+                    <div class="media-body ">
+                        <h5 class="bold">{{object.name|slice:50}}</h5>
+                        <h4 class="mt-3 mb-4 bold"> <span class="mt-5">&#x20B9;</span> {{object.price}} <span class="small text-muted"> via (COD) </span></h4>
+                        {% comment %} <p class="text-muted">Tracking Status on: <span class="Today">11:30pm, Today</span></p>
+                        <button type="button" class="btn  btn-outline-primary d-flex">Reached Hub, Delhi</button>     {% endcomment %}
+                    </div> <img src="{{image.image.url}}" alt="" height='180' width='180'>
                 </div>
             </div>
-        </div>
-        <div class="card-footer d-flex">
-            <button class="btn btn-success ml-auto" id="checkout-button">Checkout</button>
+            
+            <div class="row px-3">
+                <div class="col">
+                    <ul id="progressbar" >
+                        {% if order.status == "Shipped" %}{% endif %}
+                        <li class="step0 active " id="step1">PLACED</li>
+                        {% if order.status == "Shipped" %}
+
+                        <li class="step0 text-muted text-center " id="step2">SHIPPED</li>
+                        {% elif order.status == 'Delivered' %}
+                        <li class="step0 active text-center " id="step2">SHIPPED</li>
+                        <li class="step0 active text-right" id="step3">DELIVERED</li>
+
+                        {% else %}
+                        
+                        <li class="step0 text-muted  text-center " id="step2">SHIPPED</li>
+                        <li class="step0 text-muted  text-right" id="step3">DELIVERED</li>
+
+                        {% endif %}
+
+
+
+                        {% comment %} <li class="step0 {% if order.status == "Shipped" %}active  {% else %} text-muted {% endif %}text-center " id="step2">SHIPPED</li>
+
+                        <li class="step0 {% if order.status == "Delivered" %}active  {% else %} text-muted {% endif %}  text-right" id="step3">DELIVERED</li> {% endcomment %}
+
+                    </ul>
+                    
+                </div>
+            </div>
+             {% comment %} <div class="card-footer  bg-white px-sm-3 pt-sm-4 px-0">
+                <div class="row text-center  ">
+                    <div class="col my-auto  border-line "><h5 >Track</h5></div>
+                    <div class="col  my-auto  border-line "><h5>Cancel</h5></div>
+                    <div class="col my-auto   border-line "><h5>Pre-pay</h5></div>
+                    <div class="col  my-auto mx-0 px-0 "><img class="img-fluid cursor-pointer" src="https://img.icons8.com/ios/50/000000/menu-2.png" width="30" height="30"></div>
+                </div>
+            </div> {% endcomment %}
         </div>
     </div>
-</div>
-<!-- Add JavaScript Here-->
 
-<script src="https://js.stripe.com/v3/"></script>
-<script type="text/javascript">
-    // Create an instance of the Stripe object with your publishable API key
-    var stripe = Stripe('{{ stripe_publishable_key }}');
-    var checkoutButton = document.getElementById('checkout-button');
 
-    checkoutButton.addEventListener('click', function () {
-
-        var email = document.getElementById('email').value;
-        if (email.length == 0) {
-            alert("Please enter your email address.");
-            return;
-        }
-
-        // Create a new Checkout Session using the server-side endpoint you
-        // created in step 3.
-        fetch("{% url 'api_checkout_session' id=object.id %}", {
-            method: 'POST',
-            body: JSON.stringify(
-                { email: email }
-            )
-        })
-            .then(function (response) {
-                return response.json();
-            })
-            .then(function (session) {
-                return stripe.redirectToCheckout({ sessionId: session.sessionId });
-            })
-            .then(function (result) {
-                // If `redirectToCheckout` fails due to a browser or network
-                // error, you should display the localized error message to your
-                // customer using `error.message`.
-                if (result.error) {
-                    alert(result.error.message);
-                }
-            })
-            .catch(function (error) {
-                console.error('Error:', error);
-            });
-    });
-</script> {% endcomment %}
 {% endblock content %}

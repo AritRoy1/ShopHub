@@ -1,5 +1,6 @@
 {% extends 'product/vendor_base.html' %}
 {% load static %}
+{% if approved.has_approved %}  
 {% block content %}
 
 
@@ -77,13 +78,15 @@
       
      
         {% for img in image %}
+        
         {% if img.product.id == data.product.id %}
+        
         <td> <img src="{{ img.image.url }}" alt="Profile Pic" height="40px" width="40px" /></td>
         {% endif %}
         {% endfor %}
         <td>{{data.status}}</td>
-        {% comment %} <td><a class="btn btn-primary btn-xs" href="{% url 'update-order' order.id  %}"><span class="glyphicon glyphicon-edit"></span></a>
-        <a class="btn btn-danger btn-xs" href="{% url 'delete-order' order.id  %}"><span class="glyphicon glyphicon-trash"></span></a></td> {% endcomment %}
+        <td><a class="btn btn-primary btn-xs" href="{% url 'update-status' data.id %}"><span class="glyphicon glyphicon-edit"></span></a>
+        <a class="btn btn-danger btn-xs" href="{% url 'delete-status' data.id  %}"><span class="glyphicon glyphicon-trash"></span></a></td>
 
       
 
@@ -96,5 +99,8 @@
     </table>
   </div>
 </div>
-
 {% endblock content %}
+{% else %}
+<h1>Jai mata di</h1>
+{% endif %}
+

@@ -30,6 +30,7 @@ class Vendor(User):
     aadhar_number = models.CharField(max_length=12)
     ac_number = models.CharField(max_length=20)
     gst_invoice = models.FileField(upload_to='Vendor_Gst_Images/', max_length=250)
+    has_approved = models.BooleanField(default=False, blank=True, null=True)
     
     class Meta:
         verbose_name = "Vendor" 

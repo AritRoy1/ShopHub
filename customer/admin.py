@@ -11,7 +11,7 @@ class CustomerAdmin(admin.ModelAdmin):
     
 @admin.register(Vendor)
 class VendorAdmin(admin.ModelAdmin):
-    list_display = ['id','username', 'first_name', 'last_name', 'password']
+    list_display = ['id','username', 'first_name', 'last_name', 'has_approved','password']
 
 @admin.register(MultipleAddress)
 class MultipleAddressAdmin(admin.ModelAdmin):

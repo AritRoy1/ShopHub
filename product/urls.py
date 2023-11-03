@@ -11,6 +11,9 @@ urlpatterns = [
     path('update-product/<int:pk>/<int:val>/', views.update_product_view,name='update-product'),
     path('add-product', views.addProducts, name='add-product'),
     path('view-order/', views.view_Order, name = "view-order"),
+    path('update-status/<pk>/', views.update_order_status, name='update-status'),
+    path('delete-status/<pk>/', views.delete_order_status, name='delete-status'),
+    
     
     path('add-to-cart/', views.add_to_cart, name = 'add-to-cart'),
     path('show-cart/', views.show_cart, name = 'showcart'),
@@ -20,7 +23,4 @@ urlpatterns = [
     path('search/', views.search, name = 'search'),
     path("wishlist/", views.wishlist, name='wishlist'),
     
-    
-    
-        
 ]

@@ -6,12 +6,14 @@ from django.shortcuts import get_object_or_404, render
 from django.urls import reverse, reverse_lazy
 from .models import Product, OrderDetail
 from django.views.generic import ListView, CreateView, DetailView, TemplateView
+from django.views import View
 import stripe
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 import json
 from product.models import Image
 from customer.models import Customer
+from django.core.mail import send_mail
 
 # Create your views here.
 
@@ -91,24 +93,38 @@ class PaymentSuccessView(TemplateView):
         order = get_object_or_404(OrderDetail,session_id = session.id)
         order.has_paid = True
         order.save()
+        subject = 'Payment Successfull'
+        message = f'Your Order is Conformed, Your order will reach soon, You can track your Order..'
+        email_from = settings.EMAIL_HOST_USER
+        recipient_list = ['arit2000roy@gmail.com' ]
+        send_mail( subject, message, email_from, recipient_list )
+
         return render(request, self.template_name)
 
 class PaymentFailedView(TemplateView):
     
     template_name = "payments/payment_failed.html"
 
-class OrderHistoryListView(ListView):
-    model = OrderDetail
-    template_name = "payments/order_history.html"
+class OrderHistoryView(View):
+    def get(self, request):
+        print(request.user)
+        model = OrderDetail.objects.filter(customer__username=request.user)
+        return render(request, 'payments/order_history.html', {"object_list":model})
+           
+    # model = OrderDetail.objects.get()
+    # template_name = "payments/order_history.html"
     
 class TrackDetailView(DetailView):
     
-    print("jhhgf")
+   
     model = Product
     template_name = "payments/track_detail.html"
     def get_context_data(self, **kwargs,):
         pk=self.kwargs.get('pk')
         context = super(TrackDetailView, self).get_context_data(**kwargs)
         context['image'] = Image.objects.get(product__id = pk)
+        context['order'] = OrderDetail.objects.get(product__id = pk)
+        
+        
         return context
     
