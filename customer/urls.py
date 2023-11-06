@@ -2,6 +2,14 @@ from django.urls import path
 from customer import views
 from django.contrib.auth import views as auth_view
 from .forms import LoginForm
+from django.contrib.auth.views import (
+    
+    PasswordResetView, 
+    PasswordResetDoneView, 
+    PasswordResetConfirmView,
+    PasswordResetCompleteView
+)
+
 
 urlpatterns = [
     
@@ -15,6 +23,14 @@ urlpatterns = [
     #         authentication_form=LoginForm), name='login')
     path('login/', views.Login.as_view(), name= 'login'),
     path('logout/', views.logout_view, name='logout'),
+    
+    # reset password 
+    
+    path('password-reset/', PasswordResetView.as_view(template_name='customer/password_reset.html'),name='password-reset'),
+    path('password-reset/done/', PasswordResetDoneView.as_view(template_name='customer/password_reset_done.html'),name='password_reset_done'),
+    path('password-reset-confirm/<uidb64>/<token>/', PasswordResetConfirmView.as_view(template_name='customer/password_reset_confirm.html'),name='password_reset_confirm'),
+    path('password-reset-complete/',PasswordResetCompleteView.as_view(template_name='customer/password_reset_complete.html'),name='password_reset_complete'),
+
     path('electronics-detail/', views.ProductDetail.as_view() ,name='Electronics'),
     path('product-list/<int:pk>', views.ProductList.as_view(), name="product-list"),
     path('product-detail/<int:pk>', views.ProductDetail.as_view(), name='product-detail'),

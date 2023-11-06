@@ -74,10 +74,10 @@
 {% block elctronics %}
 
 
-{% for key, value in dict2.items %}
+{% comment %} {% for key, value in dict2.items %}
 
 
-  <b> Best {{key}} For You</b> <br> <br>
+  <b style="font-size: xx-large;"> Best {{key}} For You</b> <br> <br>
 
  {% for val in value %}
 
@@ -89,9 +89,65 @@
  {% endfor %} <br> <hr>
 
 
+{% endfor %} {% endcomment %}
+
+{% for page in page_obj %}
+
+<b style="font-size: xx-large;"> Best {{page.0}} For You</b> <br> <br>
+
+    {% for item in page.1 %}
+    <a href="{% url 'product-detail' item.id %}"> <img src=" {{item.image.url}}" alt="" height="300px" width="300px">
+      <b>From Rs.</b>{{item.product.price}}
+    </a>
+
+    {% endfor %} <br><br> <br>
+
+
+
 {% endfor %}
+
+
+ {% comment %} <div>
+  <span>
+  
+      {% if page_obj.has_previous %}
+      <a href="?page={{page_obj.previous_page_number}}">Previous</a>
+      {% endif %}
+      <span>{{page_obj.number}}</span>
+  
+      {% if page_obj.has_next %}
+      <a href="?page={{page_obj.next_page_number}}">Next</a>
+      {% endif %}
+  </span>
+  
+  </div>  {% endcomment %}
+
+<center style="position: relative; left: 750px;">
+
+  <ul class="pagination">
+    {% if page_obj.has_previous %}
+    <li class="page-item">
+      <a href="?page={{page_obj.previous_page_number}}">Previous</a>
+      {% endif %}
+    </li>
+
+    <li class="page-item"><a class="page-link" href="">{{page_obj.number}}</a></li>
+
+   
+      {% if page_obj.has_next %}
+      <a href="?page={{page_obj.next_page_number}}">Next</a>
+      {% endif %}
+  </ul>
+</center>
+
+  
 
 
 {% endblock elctronics %} 
 
+
 {% comment %} slides.length {% endcomment %}
+
+
+
+

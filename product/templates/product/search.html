@@ -68,21 +68,20 @@
     </div>
 </div> 
 
-<div>
+ <div>
 <span>
 
-    {% if image.has_previous %}
-    <a href="?page={{image.next_page_number}}">Previous</a>
+    {% if page_obj.has_previous %}
+    <a href="?page={{page_obj.previous_page_number}}">Previous</a>
     {% endif %}
-    <span>{{image.number}}</span>
+    <span>{{page_obj.number}}</span>
 
-    {% if image.has_next %}
-    <a href="">Next</a>
+    {% if page_obj.has_next %}
+    <a href="?page={{page_obj.next_page_number}}">Next</a>
     {% endif %}
 </span>
 
-</div>
-
+</div> 
 
 
 

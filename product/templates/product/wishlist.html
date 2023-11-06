@@ -3,10 +3,14 @@
 
 
 {% for wish in wishlist %}
-<img src="{{wish.image.image.url}}"height="300px" width = "400px" alt="not">
-    {{wish.product.name}}
 
-{% endfor %}
+<a href="{% url 'product-detail' wish.image.id %}">
+<img src="{{wish.image.image.url}}"height="300px" width = "400px" alt="not">
+    {{wish.product.name}} <br><br>
+
+
+</a>
+{% endfor %} 
 
 <br><br>
 {% endblock wishlist %}

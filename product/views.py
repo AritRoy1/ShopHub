@@ -394,9 +394,7 @@ def search(request):
             # filter by price
             if test=='1':
                 image  = Image.objects.filter(Q(product__sub__name__icontains=query) & Q(product__price__lte=30000)) 
-                paginator = Paginator(image, 3)
-                page_number =  request.GET.get('page')
-                page_obj = paginator.get_page(page_number)
+               
                 return render(request, 'product/search.html', {"image":image, "dict1":dict1, "query":query, "brand_item":brand_item, "color_item":color_item})
     
             elif test=="2":
@@ -439,9 +437,12 @@ def search(request):
     image = Image.objects.filter(Q(product__category__name__icontains=query)|Q(product__sub__name__icontains=query)).order_by('id')
     paginator = Paginator(image, 3)
     page_number =  request.GET.get('page')
+    print("pagenumber", page_number)
     page_obj = paginator.get_page(page_number)
+    print("page", page_obj)
+    
         
     if query == "":
-            return render(request, 'product/search.html', {"image":page_obj, "dict1":dict1,'query':query,})
+            return render(request, 'product/search.html', {"image":image, "dict1":dict1,'query':query,})
     else: 
-        return render(request, 'product/search.html', {"image":page_obj, "dict1":dict1,'query':query, "brand_item":brand_item,"color_item":color_item})
+        return render(request, 'product/search.html', {"image":image, "dict1":dict1,'query':query, "brand_item":brand_item,"color_item":color_item, "page_obj":page_obj})

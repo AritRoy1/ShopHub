@@ -11,13 +11,33 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.decorators import login_required
 from ShopHub import settings
+from django.core.paginator import Paginator
+
 def home(request):
+    # before pagination 
+    
+    # category = Category.objects.all()
+    # subcatagory = SubCategory.objects.all()   
+    # image = Image.objects.all()
+       
+    # dict1={}
+    # dict2={}
+    # for item in category:
+
+    #     dict1[item.name]=SubCategory.objects.filter(category__name = item.name)    
+    
+    # for sub in subcatagory:
+    #     dict2[sub.name]=Image.objects.filter(product__sub__name=sub.name)  
+        
+    
+    # return render(request, 'customer/home.html', {'category':category, "dict1":dict1, "dict2":dict2,  'image':image, 'subactegory':subcatagory,})
+
+
+    # after pagination
     category = Category.objects.all()
     subcatagory = SubCategory.objects.all()   
     image = Image.objects.all()
-    # image1 = Image.objects.filter()
-    
-    
+       
     dict1={}
     dict2={}
     for item in category:
@@ -25,10 +45,15 @@ def home(request):
         dict1[item.name]=SubCategory.objects.filter(category__name = item.name)    
     
     for sub in subcatagory:
-        dict2[sub.name]=Image.objects.filter(product__sub__name=sub.name)
-    print(dict2)
+        dict2[sub.name]=Image.objects.filter(product__sub__name=sub.name)  
+        
+    dict2_list = list(dict2.items())
+    paginator = Paginator(dict2_list, 3, orphans=1)
+    page_number =  request.GET.get('page') 
+    page_obj = paginator.get_page(page_number)
     
-    return render(request, 'customer/home.html', {'category':category, "dict1":dict1, "dict2":dict2,  'image':image, 'subactegory':subcatagory})
+    return render(request, 'customer/home.html', {'category':category, "dict1":dict1, "dict2":dict2,  'image':image, 'subactegory':subcatagory,"page_obj":page_obj})
+
 
 def CustomerRegistration(request):
     if request.method == "POST":
@@ -42,7 +67,7 @@ def CustomerRegistration(request):
         form = CustomerRegistrationForm()
     return render(request, 'customer/customer.html', {"form":form})
 
-## working login form 
+## login form 
 
 # class Login(View):
 #     def get(self, request):    
@@ -76,6 +101,7 @@ def CustomerRegistration(request):
 
     ##--------------->>>>>>>>>>>>>>>
     
+## updated login form
 class Login(View):
     def get(self, request):    
         form =LoginForm
