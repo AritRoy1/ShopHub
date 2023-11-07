@@ -18,24 +18,23 @@
             </thead>
             <tbody>
                 
-                {% for i in object_list %}
-                
-               
+                {% for item in object_list %}
+            
                     <tr>
-                        <td>{{ i.product.name }}</td>
+                        <td>{{ item.product.name }}</td>
                         
-                        <td>{{ i.amount }}</td>
+                        <td>{{ item.amount }}</td>
                         <td>
-                            {% if i.has_paid %}
+                            {% if item.has_paid %}
                                 <b class="text-success">Success</b>
                             {% else %}
                                 <b class="text-danger">Failed</b>
                             {% endif %}
                         </td>
-                        <td>{{ i.order_date }}</td>
+                        <td>{{ item.order_date }}</td>
                         <td>
-                            {% if i.has_paid %}
-                               <a href="{% url 'track-product' i.product.id %}"> <b class="text-primary">Track</b> </a>
+                            {% if item.has_paid %}
+                               <a href="{% url 'track-product' item.product.id item.id %}"> <b class="text-primary">Track</b> </a>
                             {% else %}
                                 <b class="text-danger">Payment Failed</b>
                             {% endif %}

@@ -161,7 +161,7 @@ class ProductDetail(View):
         # wishlist = Wishlist.objects.all()
         wishlist = Wishlist.objects.filter(customer__username=request.user)
         
-        print(wishlist)
+    
         dict1={}
         for item in category:
             dict1[item.name]=SubCategory.objects.filter(category__name = item.name)
@@ -172,13 +172,13 @@ class ProductDetail(View):
         
         img = Image.objects.get(pk=pk)
         print("img",img.product)
-        pro=img.product
+        pro = img.product
         print("pro", pro)
-        l=[]
-        for i in wishlist:
-            l.append(i.product)
+        list_item=[]
+        for item in wishlist:
+            list_item.append(item.product)
         flag= False
-        if pro in l:
+        if pro in list_item:
             flag= True
         else:
             flag = False

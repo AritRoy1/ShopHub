@@ -1,0 +1,18 @@
+{% extends "customer/base.html" %}
+{% block content %}
+
+<div>
+    {{image.product.name}} <br>
+    <img src="{{image.image.url}}" height="50px" width="50px" alt=""> 
+</div>
+
+<h1>Order Cancelation Form</h1>
+
+<form action="" method ="POST">
+
+    {% csrf_token %}
+    {{form.as_p}}
+    <input type="submit" value="Submit">
+</form>
+{% endblock content %}
+

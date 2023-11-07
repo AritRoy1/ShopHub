@@ -211,8 +211,10 @@
                     <p class="text-muted" style="display:none;"> Order ID  <span class="font-weight-bold text-dark">1222528743</span></p> 
                     <p class="text-muted" style="display:none;"> Place On <span class="font-weight-bold text-dark">12,March 2019</span> </p></div>
                     <div class="flex-col my-auto">
+                    
                         <h6 class="ml-auto mr-3">
-                            <a href="#">View Details</a>
+                            <a href="{% url 'order-cancel' image.product.id image.id order.id %}">Cancel Order </a>
+                            
                         </h6>
                     </div>
               </div>

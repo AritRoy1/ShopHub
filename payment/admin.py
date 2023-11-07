@@ -6,4 +6,7 @@ from .models import *
 @admin.register(OrderDetail)
 class OrderAdmin(admin.ModelAdmin):
     list_display = ['id','customer', 'product','has_paid', 'status', 'order_date', 'updated_on']
+@admin.register(CancelOrder)
+class OrderCancelAdmin(admin.ModelAdmin):
+    list_display = ['id', 'customer', 'product']
     

@@ -45,3 +45,17 @@ class OrderDetail(models.Model):
     updated_on = models.DateTimeField(
         auto_now_add=True
     )
+    
+    
+REASION_FOR_CANCEL=[
+    ("EXD","Expected delivery date has changed and the product is arriving at a later date."),
+    ('PRA.',"Product is not required anymore."),
+    ('change my mind', 'Change My Mind'),
+    ('BR', 'Bad review from friends/relatives after ordering the product.')
+    
+    
+]
+class CancelOrder(models.Model):
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    reasion = models.CharField(max_length=100, choices=REASION_FOR_CANCEL)

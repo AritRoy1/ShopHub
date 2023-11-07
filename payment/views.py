@@ -16,6 +16,7 @@ import json
 from product.models import Image
 from customer.models import Customer
 from django.core.mail import send_mail
+from payment.forms import CancelOrderForm
 
 # Create your views here.
 
@@ -43,18 +44,13 @@ def create_checkout_session(request, id):
                 'quantity': 1,
             }
         ],
+        metadata = {"product_id":id},
         mode='payment',
         success_url=request.build_absolute_uri(
             reverse('success')
         ) + "?session_id={CHECKOUT_SESSION_ID}",
         cancel_url=request.build_absolute_uri(reverse('failed')),
     )
-
-    # OrderDetail.objects.create(
-    #     customer_email=email,
-    #     product=product, ......
-    # )
-
 
     order = OrderDetail()
     # order.customer_email = request_data['email']
@@ -75,24 +71,24 @@ class PaymentSuccessView(TemplateView):
     template_name = "payments/payment_success.html"
 
     def get(self, request, *args, **kwargs):
-        session_id = request.GET.get('session_id')
+        # session_id = request.GET.get('session_id')
   
-        if session_id is None:
-            return HttpResponseNotFound()
+        # if session_id is None:
+        #     return HttpResponseNotFound()
         
-        stripe.api_key = settings.STRIPE_SECRET_KEY
-        session = stripe.checkout.Session.retrieve(session_id)
-        order = get_object_or_404(OrderDetail,session_id = session.id)
-        order.has_paid = True
-        order.save()
+        # stripe.api_key = settings.STRIPE_SECRET_KEY
+        # session = stripe.checkout.Session.retrieve(session_id)
+        # order = get_object_or_404(OrderDetail,session_id = session.id)
+        # order.has_paid = True
+        # order.save()
         
-        subject = 'Payment Successfull'
-        message = f'Your Order is Conformed, Your order will reach soon, You can track your Order..'
-        email_from = settings.EMAIL_HOST_USER
-        recipient_list = ['amritabairagy1@gmail.com' ]
-        send_mail( subject, message, email_from, recipient_list )
+        # subject = 'Payment Successfull'
+        # message = f'Your Order is Conformed, Your order will reach soon, You can track your Order..'
+        # email_from = settings.EMAIL_HOST_USER
+        # recipient_list = ['arit2000roy@gmail.com' ]
+        # send_mail( subject, message, email_from, recipient_list )
 
-        return render(request, self.template_name)
+        return render(request,self.template_name)
 
 class PaymentFailedView(TemplateView):
     
@@ -107,16 +103,20 @@ class OrderHistoryView(View):
     # model = OrderDetail.objects.get()
     # template_name = "payments/order_history.html"
     
-class TrackDetailView(DetailView):
+class TrackDetail(DetailView):
     
    
     model = Product
     template_name = "payments/track_detail.html"
     def get_context_data(self, **kwargs,):
         pk=self.kwargs.get('pk')
-        context = super(TrackDetailView, self).get_context_data(**kwargs)
+        item_id = self.kwargs.get('item_id')
+        print(item_id)
+        context = super(TrackDetail, self).get_context_data(**kwargs)
         context['image'] = Image.objects.get(product__id = pk)
-        context['order'] = OrderDetail.objects.get(product__id = pk)     
+        # context['order'] = OrderDetail.objects.filter(product__id = pk,customer=self.request.user)     
+        context['order'] = OrderDetail.objects.get(id=item_id)     
+
         return context
     
 ## webhook
@@ -140,25 +140,85 @@ def my_webhook_view(request):
     # Invalid signature
     return HttpResponse(status=400)
 
-  
+
   # Handle the checkout.session.completed event
   if event['type'] == 'checkout.session.completed':
-    # Retrieve the session. If you require line items in the response, you may include them by expanding line_items.
-    print("checkout.session.completed")
-    
-    session = stripe.checkout.Session.retrieve(
-      event['data']['object']['id'],
-      expand=['line_items'],
-    )
+    session = event['data']['object']
 
-    line_items = session.line_items
-    # Fulfill the purchase...
-    fulfill_order(line_items)
+    # Save an order in your database, marked as 'awaiting payment'
+    create_order(request, session)
+
+    # Check if the order is already paid (for example, from a card payment)
+    #
+    # A delayed notification payment will have an `unpaid` status, as
+    # you're still waiting for funds to be transferred from the customer's
+    # account.
+    
+    if session.payment_status == "paid":
+      # Fulfill the purchase
+      fulfill_order(session)
+
+  elif event['type'] == 'checkout.session.async_payment_succeeded':
+    session = event['data']['object']
+
+    # Fulfill the purchase
+    fulfill_order(session)
+
+  elif event['type'] == 'checkout.session.async_payment_failed':
+    session = event['data']['object']
+
+    # Send an email to the customer asking them to retry their order
+    email_customer_about_failed_payment(session)
 
   # Passed signature verification
   return HttpResponse(status=200)
 
-def fulfill_order(line_items):
-  # TODO : fill me in
-  print("Fulfilling order")
 
+def create_order(request,session):
+        print(session['customer_details']['email'])    
+        order = get_object_or_404(OrderDetail,session_id = session['id'])
+
+
+def fulfill_order(session):
+        print(session['customer_details']['email'])
+        order = get_object_or_404(OrderDetail,session_id = session['id'])       
+        order.has_paid = True
+        order.save()
+        
+        # send email to customer for payment successfull             
+        subject = 'Payment Successfull'
+        message = f'Your Order is Conformed, Your order will reach soon, You can track your Order..'
+        email_from = settings.EMAIL_HOST_USER
+        recipient_list = [session['customer_details']['email']]
+        send_mail( subject, message, email_from, recipient_list )
+
+
+
+def email_customer_about_failed_payment(session):
+    
+     # send email to customer for payment is  Not successfull  
+    subject = 'Payment Faild'
+    message = f'Your Order is Not Conformed, Due To Payment Falid..'
+    email_from = settings.EMAIL_HOST_USER
+    recipient_list = [session['customer_details']['email'] ]
+    send_mail( subject, message, email_from, recipient_list ) 
+    print("Emailing customer")
+
+
+
+class CancelOrder(View):
+    def get(self, request, product_id, image_id, order_id ):
+      image = Image.objects.get(pk=image_id)  
+      form = CancelOrderForm()
+      return render(request, 'payments/order_cancel.html', {"form":form, "image":image})
+      
+    def post(self, request, product_id, image_id, order_id):
+      
+      form = CancelOrderForm(request.POST)
+      order = OrderDetail.objects.get(id=order_id)
+      if form.is_valid():  
+        order.has_paid=False
+        order.save()  
+        print("form post")
+    
+        return render(request,'payments/order_cancel_successfilly.html')
