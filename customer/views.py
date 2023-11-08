@@ -12,6 +12,11 @@ from django.shortcuts import get_object_or_404
 from django.contrib.auth.decorators import login_required
 from ShopHub import settings
 from django.core.paginator import Paginator
+#import ratting for product_detail
+
+from ratting.models import Ratting
+from django.db.models import Avg
+
 
 def home(request):
     # before pagination 
@@ -156,24 +161,20 @@ class ProductList(View):
 
 class ProductDetail(View):
     def get(self, request, pk):
-        category = Category.objects.all()
-        
-        # wishlist = Wishlist.objects.all()
+        category = Category.objects.all()    
+        stripe_publishable_key = settings.STRIPE_PUBLISHABLE_KEY
         wishlist = Wishlist.objects.filter(customer__username=request.user)
-        
-    
         dict1={}
         for item in category:
             dict1[item.name]=SubCategory.objects.filter(category__name = item.name)
-            
-        print(pk)   
-        
+                   
         phone = Product.objects.filter(id=pk)
         
+        
         img = Image.objects.get(pk=pk)
-        print("img",img.product)
+      
         pro = img.product
-        print("pro", pro)
+    
         list_item=[]
         for item in wishlist:
             list_item.append(item.product)
@@ -183,11 +184,14 @@ class ProductDetail(View):
         else:
             flag = False
         
-        stripe_publishable_key = settings.STRIPE_PUBLISHABLE_KEY
+        rattings = Ratting.objects.filter(product__image__id=pk)
+        average_rating = rattings.aggregate(Avg('ratting'))['ratting__avg']
+        
+       
         
         
         return render(request, 'customer/product_detail.html', {"phone":phone,
-                "img":img, 'category':category, 'dict1':dict1, "flag":flag, "stripe_publishable_key":stripe_publishable_key})
+                "img":img, 'category':category, 'dict1':dict1, "flag":flag, "stripe_publishable_key":stripe_publishable_key, "average_rating":round(average_rating) if average_rating else 0,"rattings":rattings})
 
 
 class CustomerProfile(View):

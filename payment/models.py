@@ -30,7 +30,7 @@ class OrderDetail(models.Model):
     amount = models.IntegerField(
         verbose_name='Amount'
     )
-    status = models.CharField(max_length=30, choices=CHOICES_STATUS, default = "Pending")
+    status = models.CharField(max_length=30, choices=CHOICES_STATUS, default = "Placed")
     
     has_paid = models.BooleanField(
         default=False,
@@ -55,6 +55,7 @@ REASION_FOR_CANCEL=[
     
     
 ]
+
 class CancelOrder(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)

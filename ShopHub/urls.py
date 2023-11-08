@@ -10,6 +10,7 @@ urlpatterns = [
     path('', include('customer.urls')),
     path("product/", include('product.urls'), name='product'),
     path('payment/', include("payment.urls"), name="payment"),
+    path('ratting/', include('ratting.urls')),
 
     
     # path('customer/registration', views.CustomerRegistration, name='customer-registration'),

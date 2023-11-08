@@ -119,7 +119,8 @@ class TrackDetail(DetailView):
 
         return context
     
-## webhook
+## Webhook
+
 endpoint_secret = 'whsec_589a26ad9858647a340c08dd70f384294d7dc130a853e12fd2d939fa42e5de05'
 stripe.api_key = shop_settings.STRIPE_API_KEY
 
@@ -219,6 +220,14 @@ class CancelOrder(View):
       if form.is_valid():  
         order.has_paid=False
         order.save()  
-        print("form post")
+        subject = 'Order Cancel'
+        message = f'Your order has been cancel .. Your Paymnet will send to your account within 5 to 6 working day'
+        email_from = settings.EMAIL_HOST_USER
+        # recipient_list = [session['customer_details']['email'] ]
+        recipient_list = ['arit2000roy@gmail.com' ]
+        
+        send_mail( subject, message, email_from, recipient_list ) 
+        print("Emailing customer")
+        
     
         return render(request,'payments/order_cancel_successfilly.html')

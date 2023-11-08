@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'customer', 
     'product',
+    'ratting',
     
     'payment',
     'widget_tweaks',
