@@ -273,6 +273,8 @@ def manage_products(request):
     approved = Vendor.objects.get(username = request.user)
     user = request.user
     images = Image.objects.filter(product__vendor__username=user)
+    
+    
     return render(request, 'product/vendor_products.html', {"images":images,"approved":approved})
 
 # @login_required(login_url='login')
@@ -330,10 +332,12 @@ def addProducts(request):
             product = Product(name=name,description=description, price=price,brand=brand, color=color,category=category, sub=sub, vendor=vendor)
             product.save()
             
-    
-            files =request.FILES['file']
-            Image.objects.create(product = product, image=files)
-            # productForm.save()
+            files = request.FILES.getlist('file')
+            print("files",files)
+            if files:
+                for file in files:       
+                    Image.objects.create(product = product, image=file)
+            
             return redirect('manage-products')
     return render(request,'product/vendor_add_products.html',{'productForm':productForm})
 

@@ -117,7 +117,7 @@ class TrackDetail(DetailView):
         context['image'] = Image.objects.get(product__id = pk)
         # context['order'] = OrderDetail.objects.filter(product__id = pk,customer=self.request.user)     
         context['order'] = OrderDetail.objects.get(id=item_id)     
-        context['rattings'] = Ratting.objects.filter(customer=self.request.user, product__id=pk)
+        context['rattings'] = Ratting.objects.filter(customer=self.request.user, product__id=pk, order__id=item_id)
 
         return context
     

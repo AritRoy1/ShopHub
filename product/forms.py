@@ -20,6 +20,7 @@ class VendorRegistrationForm(UserCreationForm):
         widgets = {'address':forms.Textarea(attrs={'cols':34, 'rows':4})}
         
 class ProductAddForm(forms.ModelForm):
+    # images = forms.ImageField(widget=forms.ClearableFileInput(attrs={'multiple': True}))
     class Meta:
         model = Product
         fields = ['name', 'description', 'price', 'brand', 'color', 'category', 'sub']

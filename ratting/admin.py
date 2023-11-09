@@ -5,4 +5,4 @@ from .models import Ratting
 
 @admin.register(Ratting)
 class RattingAdmin(admin.ModelAdmin):
-    list_display = ['id', 'customer', 'product', 'ratting', 'created_at']
+    list_display = ['id', 'customer', 'product',"order", 'ratting', 'created_at']
