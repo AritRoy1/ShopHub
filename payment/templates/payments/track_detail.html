@@ -6,6 +6,11 @@
 <link rel="stylesheet" href="{% static 'payment/css/order_track.css' %}">
 <script src="{% static 'payment/js/ratting.js' %}"></script>
 
+<style>
+    .checked{
+        color:orange;
+    }
+</style>
 
     <div class="container-fluid my-5 d-sm-flex justify-content-center">
         <div class="card px-2">
@@ -14,9 +19,8 @@
                 <div class="col">
                     <p class="text-muted" style="display:none;"> Order ID  <span class="font-weight-bold text-dark">1222528743</span></p> 
                     <p class="text-muted" style="display:none;"> Place On <span class="font-weight-bold text-dark">12,March 2019</span> </p></div>
-
                     <div class="flex-col my-auto">
-                         {% if  order.status == "Shipped" or order.status == "Placed" %}
+                         {% if  order.status == "Shipped" or order.status == "Placed" or order.status == "Pending" %}
                          
                          <a href="{% url 'order-cancel' image.product.id image.id order.id %}">Cancel Order </a>
                         
@@ -44,19 +48,27 @@
                 <div class="col">
                     <ul id="progressbar" >
 
-                        
-                        <li class="step0 active " id="step1">PLACED</li>
+                        {% if order.status == 'Placed' %}
+                        <li class="step0 active" id="step1">PLACED</li>
+                        <li class="step0 text-muted text-center " id="step2">SHIPPED</li>
+                        <li class="step0 text-muted text-right" id="step3">DELIVERED</li>
 
-                        {% if order.status == "Shipped" %}
+                        {% elif order.status == "Shipped" %}
+                        <li class="step0 active " id="step1">PLACED</li>
 
                         <li class="step0 active text-center " id="step2">SHIPPED</li>
                         <li class="step0 text-muted text-right" id="step3">DELIVERED</li>
                         
+                      
+
+
                         {% elif order.status == 'Delivered' %}
+                        <li class="step0 active " id="step1">PLACED</li>
                         <li class="step0 active text-center " id="step2">SHIPPED</li>
                         <li class="step0 active text-right" id="step3">DELIVERED</li>
 
                         {% else %}
+                        <li class="step0 active " id="step1">PLACED</li>
                         
                         <li class="step0 text-muted  text-center " id="step2">SHIPPED</li>
                         <li class="step0 text-muted  text-right" id="step3">DELIVERED</li>
@@ -71,6 +83,26 @@
         </div>
         
     </div> 
+    {% if rattings %}
+
+    {% for rat in rattings  %}
+    <h2>You Rate This Product</h2>
+
+    <h3>
+    <span class="fa fa-star {% if  rat.ratting > 0 %} checked {% endif %}"></span>
+    <span class="fa fa-star {% if  rat.ratting > 1 %} checked {% endif %}"></span>
+    <span class="fa fa-star {% if  rat.ratting > 2 %} checked {% endif %}"></span>
+    <span class="fa fa-star {% if  rat.ratting > 3 %} checked {% endif %}" ></span>
+    <span class="fa fa-star {% if  rat.ratting > 4 %} checked {% endif %}"></span>
+</h3> 
+    </h3>
+   
+    
+    
+    {% endfor %}
+    
+    
+    {% else %}
     <div style="text-align:center;">
 
     {% if order.status == 'Delivered' %}
@@ -79,7 +111,7 @@
         {% endif %} 
         </div>
 
-          <div class="popup" id="popup" style="display:none; height:900px; width:800px;">
+          <div class="popup" id="popup" style="display:none; height:700px; width:800px;">
 
               
               <div class="container">
@@ -104,6 +136,8 @@
 
         
         <br> <br>
+
+        {% endif %}
 <script>
 
 const starst=document.querySelectorAll('.star');
@@ -131,67 +165,44 @@ starst.forEach((star,index)=>{
     value_of_star = current_star
   }); 
 });
-/*
-
-document.getElementById('submitButton').addEventListener('click', function () {
-
-    const inputData = document.getElementById('dataInput').value;
-
-    // Define the URL of your backend API
-    const backendUrl = '/ratting/submit/';
-
-    // Create an object with the data to send
-    const data = {
-        input: inputData,
-        value:value_of_star,
-    };
-
-    // Make a POST request to the backend
-    fetch(backendUrl, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-    })
-    .then(response => {
-        if (response.ok) {
-            return response.json();
-        }
-        throw new Error('Network response was not ok');
-    })
-    .then(responseData => {
-        // Handle the response from the backend here
-        console.log('Backend response:', responseData);
-    })
-    .catch(error => {
-        console.error('Error:', error);
-    });
-});
 
 
-*/
-$('#submitButton').on('click', function (e) {
-    e.preventDefault();
-    
-    $.ajax({
-        type: 'POST',
-        // url: '/assessment/add-assessment/',
-        url: '/ratting/submit/',
-        data: $("#form_data").serialize(),
 
-        success: function (response) {
+$(document).ready(function () {
+    $('#submitButton').on('click', function (e) {
+        e.preventDefault();
+
+        // Serialize the form data
+        var formData = $("#form_data").serialize();
+
+        // Additional data to send
+        var additionalData = {
+            value_of_star: value_of_star,
+            prod_id: {{image.product.id}},
            
-            console.log('Data:- ', response)
-            
+        };
+        var csrfToken = $('[name=csrfmiddlewaretoken]').val();
 
-        },
-        error: function (xhr) {
-            console.log(xhr)
-        }
+        // Merge the form data and additional data
+        var combinedData = formData + '&' + $.param(additionalData);
+
+        $.ajax({
+            type: 'POST',
+            url: '/ratting/submit/',  
+            data: combinedData,
+            headers: { 'X-CSRFToken': csrfToken },
+            dataType: 'json', 
+
+            success: function (response) {
+                console.log('Data:- ', response);
+                location.reload();
+            },
+            error: function (xhr) {
+                console.log(xhr);
+            }
+        });
     });
 });
-
 
 
 </script>

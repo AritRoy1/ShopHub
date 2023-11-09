@@ -82,13 +82,19 @@
     <span class="fa fa-star {% if average_rating > 4 %} checked {% endif %}"></span>
 </h3> 
 
-<h3>Reviews:</h3>
+{% comment %} <h3>Reviews:</h3>
 {% for ratting in rattings %}
 {{ratting.comments}} <br>
 
-{% endfor %}
+{% endfor %} {% endcomment %}
 
-
+<div id="reviews">
+    {% for comment in rattings %}
+      <div class="review">{{ comment.comments }}</div>
+    {% endfor %}
+  </div>
+  
+  <button id="show-more">Show more</button>
 
 
 
@@ -178,6 +184,31 @@
     });
 </script>
 
+  {% comment %} show more review {% endcomment %}
+
+<script>
+    var page = 2;  // Initial page for loading more reviews
+  
+    $('#show-more').on('click', function() {
+      $.ajax({
+        url: '/show-more-review/',  // URL to fetch more reviews
+        data: { page: page, prod_id:{{img.product.id}} },
+        success: function(data) {
+          if (data.reviews) {
+            var $reviews = $('#reviews');
+            for (var i = 0; i < data.reviews.length; i++) {
+              var review = data.reviews[i];
+              $reviews.append('<div class="review">' + review.text + '</div>');
+            }
+            page++;
+          } else {
+            $('#show-more').prop('disabled', true).text('No more reviews');
+          }
+        }
+      });
+    });
+  </script>
+  
 
 
 {% endblock product-details %}

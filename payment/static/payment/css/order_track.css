@@ -129,7 +129,8 @@
     
     #progressbar li:nth-child(1):after {
         left: 25%;
-        width: 121%;
+        width: 122%;
+        /* background: #455A64 !important; */
     }
     #progressbar li:nth-child(3):after {
         left: 25% !important;
@@ -289,3 +290,7 @@
 p{
     text-align: center;
   }
+
+.checked{
+    color:yellow
+}

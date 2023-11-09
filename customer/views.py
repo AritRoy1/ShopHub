@@ -184,14 +184,26 @@ class ProductDetail(View):
         else:
             flag = False
         
-        rattings = Ratting.objects.filter(product__image__id=pk)
+        rattings = Ratting.objects.filter(product__image__id=pk).order_by('-id')[:5]
         average_rating = rattings.aggregate(Avg('ratting'))['ratting__avg']
-        
-       
-        
-        
+          
         return render(request, 'customer/product_detail.html', {"phone":phone,
                 "img":img, 'category':category, 'dict1':dict1, "flag":flag, "stripe_publishable_key":stripe_publishable_key, "average_rating":round(average_rating) if average_rating else 0,"rattings":rattings})
+
+def show_more_review(request):
+      print("sum")
+      page = request.GET.get('page')
+      prod_id =  request.GET.get('prod_id')
+      print(prod_id)
+      
+      page = int(page)
+      reviews = Ratting.objects.filter(product__id=prod_id).order_by('-id')[5 * (page - 1):5 * page]
+    
+      data = {
+         'reviews': [{'text': review.comments} for review in reviews],
+            }
+      return JsonResponse(data)
+    
 
 
 class CustomerProfile(View):

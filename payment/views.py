@@ -15,6 +15,7 @@ from django.views.decorators.csrf import csrf_exempt
 import json
 from product.models import Image
 from customer.models import Customer
+from ratting.models import Ratting
 from django.core.mail import send_mail
 from payment.forms import CancelOrderForm
 
@@ -116,6 +117,7 @@ class TrackDetail(DetailView):
         context['image'] = Image.objects.get(product__id = pk)
         # context['order'] = OrderDetail.objects.filter(product__id = pk,customer=self.request.user)     
         context['order'] = OrderDetail.objects.get(id=item_id)     
+        context['rattings'] = Ratting.objects.filter(customer=self.request.user, product__id=pk)
 
         return context
     
