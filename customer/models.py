@@ -27,6 +27,7 @@ class Customer(User):
     
 class Vendor(User):
     """Vendor Model"""
+    
     aadhar_number = models.CharField(max_length=12)
     ac_number = models.CharField(max_length=20)
     gst_invoice = models.FileField(upload_to='Vendor_Gst_Images/', max_length=250)
@@ -79,6 +80,8 @@ STATE_CHOICES = (
 )
 
 class MultipleAddress(models.Model):
+    """Add Multiple Address Model"""
+    
     name = models.CharField(max_length=20)
     phone_number = models.CharField(max_length=12)
     pincode = models.IntegerField()
@@ -88,6 +91,7 @@ class MultipleAddress(models.Model):
     state = models.CharField(max_length=50,choices=STATE_CHOICES)
     landmark  = models.CharField(max_length=30)
     
+    # relation
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, null=True, blank=True)
     vendor = models.ForeignKey(Vendor, on_delete= models.CASCADE, null=True, blank=True)
     

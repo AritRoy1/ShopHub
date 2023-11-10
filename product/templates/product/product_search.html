@@ -21,6 +21,7 @@
       <a class="dropdown-item" href="{% url 'search' %}?sort=2&search={{query}}">High to Low</a>
     </div>
   </div> 
+
  {% endif %}
   
     <h2 class = "text-center">Search Results for "{{ query }}"</h2>
@@ -54,7 +55,7 @@
     <div class="col-md-9"> 
 
         {% for img in image %}
-        <a href="{% url 'product-detail' img.id %}">
+        <a href="{% url 'product-detail' img.id  img.product.id %}">
         <div class="col-sm-3">
             
             <img src="{{ img.image.url }}" alt="" height="300px" width="300px">

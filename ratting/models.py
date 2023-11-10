@@ -6,6 +6,8 @@ from payment.models import OrderDetail
 # Create your models here.
 
 class Ratting(models.Model):
+    """Ratting Model in which Customer can rate product after buy"""
+    
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     order = models.ForeignKey(OrderDetail, on_delete=models.CASCADE, null=True, blank=True)

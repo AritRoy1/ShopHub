@@ -4,7 +4,7 @@
 
 {% for wish in wishlist %}
 
-<a href="{% url 'product-detail' wish.image.id %}">
+<a href="{% url 'product-detail' wish.image.id wish.product.id %}">
 <img src="{{wish.image.image.url}}"height="300px" width = "400px" alt="not">
     {{wish.product.name}} <br><br>
 

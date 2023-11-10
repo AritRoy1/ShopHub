@@ -9,7 +9,7 @@
 <div class="container my-5 mx-4">
   <div class="card flex-row flex-wrap">
     <div class="card-header border-5">
-      <a href="{% url 'product-detail' ig.id %}">
+      <a href="{% url 'product-detail' ig.id ig.product.id %}">
         <img src="{{ ig.image.url }}" width="300px" height="400px" alt="" />
 
         {% comment %}

@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.views import View
-from .forms import ProductUpdateForm, ProductAddForm, VendorRegistrationForm
+from .forms import ProductUpdateForm, ProductAddForm, VendorRegistrationForm, CancelOrderForm
 from django.http import HttpResponse , HttpResponseRedirect
 from .models import Product, Cart, Category, SubCategory, Image, Wishlist
 from customer.models import Customer, Vendor
@@ -12,42 +12,44 @@ from django.contrib.auth.decorators import login_required
 from payment.models import OrderDetail
 from .forms import UpdateOrderForm
 from django.core.paginator import Paginator
+from ratting.models import Ratting
+from ShopHub import settings
+from django.db.models import Avg
+from django.views.generic import DetailView
+from django.core.mail import send_mail
 
-
-
+# vendor registration view
 def VendorRegistration(request):
     if request.method == "POST":
         form = VendorRegistrationForm(request.POST, request.FILES)
-        # form = CustomerRegistrationForm(request.POST)
         if form.is_valid():     
             form.save()
-            # return HttpResponseRedirect('/product/registration/')
             return HttpResponseRedirect('/login/')
              
     else:        
-        form = VendorRegistrationForm()
-        
-    return render(request, 'product/vendor.html', {"form":form})
+        form = VendorRegistrationForm()     
+    return render(request, 'product/vendor_registration_form.html', {"form":form})
 
 
+# vendor redirect to vendor dashbord
 def vendor_pannel(request):
-    print("jahan",request.user)
     approved = Vendor.objects.get(username = request.user)
     return render(request, 'product/vendor_base.html', {"approved":approved})
 
 
-class ProductRegistration(View):
-    def get(self, request):
-        form =ProductUpdateForm
-        return render(request, 'product/product.html', {"form":form})
+# class ProductRegistration(View):
+#     def get(self, request):
+#         form =ProductUpdateForm
+#         return render(request, 'product/product.html', {"form":form})
     
-    def post(self, request):
-        form =ProductUpdateForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
-            return HttpResponse("sucessfully Submited")
+#     def post(self, request):
+#         form =ProductUpdateForm(request.POST, request.FILES)
+#         if form.is_valid():
+#             form.save()
+#             return HttpResponse("sucessfully Submited")
         
-               
+        
+          
 def add_to_cart(request):
      
     user = request.user
@@ -58,46 +60,55 @@ def add_to_cart(request):
     cart = Cart(customer=customer,product=product, image=image) ## 1
     all_cart = Cart.objects.filter(customer__username=request.user)
   
-    l1=[]
+    cart_list = []
     for item in all_cart:
-        l1.append(item.product)
-   
-    if product in l1:
+        cart_list.append(item.product)
+        
+    # if the product is already in cart than redirect to show cart page 
+    if product in cart_list:
         return redirect('/product/show-cart')
     else:
+        
+        # if the product is not in cart than save it and redirect to show cart page       
         cart.save() 
         return redirect('/product/show-cart') 
+   
     
-
+# after click cart in nav bar it show all cart if cart,  athorwise it gives empty cart
 def show_cart(request):
     category = Category.objects.all()
-    dict1={}
+    dict_category = {}
     for item in category:
-        dict1[item.name]=SubCategory.objects.filter(category__name = item.name)
+        dict_category[item.name]=SubCategory.objects.filter(category__name = item.name)
         
     if request.user.is_authenticated:
         user = request.user
-        print(user)
-        cart = Cart.objects.filter(customer = user)
-        
-        amount =0.0
+        cart = Cart.objects.filter(customer=user) 
+        amount = 0.0
         delivery_charges = 100
         total_amount = 0.0
-        customer = Customer.objects.get(username = user)
-        cart_product = [p for p in Cart.objects.all() if p.customer == customer]
+        customer = Customer.objects.get(username=user)
+        cart_product = [cart for cart in Cart.objects.all() if cart.customer == customer]
+        
         if cart_product:
-            for p in cart_product:
-                tempamount = (p.quantity * p.product.price)
+            for val in cart_product:
+                tempamount = (val.quantity * val.product.price)
                 amount +=tempamount
                 total_amount = amount+delivery_charges
-                # print(amount)   
-        
-            return render(request, 'product/add_to_cart.html',{'carts':cart, 'dict1':dict1, 'amount':amount, 'totalamount':total_amount}, )
+                   
+            context = {      
+                'carts':cart,
+                'dict1':dict_category,
+                'amount':amount, 
+                'totalamount':total_amount,    
+                }
+            return render(request, 'product/add_to_cart.html', context)
         else:
-            return render(request, "product/cart.html")
+            return render(request, "product/empty_cart.html")
+
     
-def add_cart(request):
-    
+# customer can add number of products in their cart
+def add_cart(request): 
     if request.method =="GET":
         prod_id = request.GET['prod_id']
         user = request.user     
@@ -106,18 +117,13 @@ def add_cart(request):
         cart.quantity+=1
         cart.save()
         delivery_charges = 100
-        amount =0.0
-        total_amount=0.0     
-        cart_product = [p for p in Cart.objects.all() if p.customer == customer]
-        for p in cart_product:
-                tempamount = (p.quantity * p.product.price)
-                print("q",p.quantity)
-                print("price",p.product.price )
-                print(tempamount)
-                amount +=tempamount
+        amount = 0.0
+        total_amount = 0.0     
+        cart_product = [cart for cart in Cart.objects.all() if cart.customer == customer]
+        for val in cart_product:
+                tempamount = (val.quantity * val.product.price)
+                amount += tempamount
                 total_amount = amount+delivery_charges
-                
-                print("amount",amount)
     data = {
         "quantity":cart.quantity,
         'amount':amount,
@@ -125,9 +131,10 @@ def add_cart(request):
             
         }
     return JsonResponse(data)
-        
-def minus_cart(request):
     
+    
+# customer can reduce products item form their cart    
+def minus_cart(request):   
     if request.method =="GET":
         prod_id = request.GET['prod_id']
         user = request.user 
@@ -140,16 +147,11 @@ def minus_cart(request):
         delivery_charges = 100
         amount =0.0
         total_amount=0.0      
-        cart_product = [p for p in Cart.objects.all() if p.customer == customer]
-        for p in cart_product:
-                tempamount = (p.quantity * p.product.price)
-                print("q",p.quantity)
-                print("price",p.product.price )
-                print(tempamount)
+        cart_product = [cart for cart in Cart.objects.all() if cart.customer == customer]
+        for val in cart_product:
+                tempamount = (val.quantity * val.product.price)
                 amount +=tempamount
                 total_amount = amount+delivery_charges
-                
-                print("amount",amount)
     data = {
         "quantity":cart.quantity,
         'amount':amount,
@@ -158,15 +160,14 @@ def minus_cart(request):
         }
     return JsonResponse(data)
 
-       
-def remove_cart(request):
-    
+
+# customer can remove/delete  products item form their cart        
+def remove_cart(request): 
     if request.method =="GET":
         prod_id = request.GET['prod_id']
         user = request.user   
         customer = Customer.objects.get(username = user)        
         cart = Cart.objects.get(Q(product__id=prod_id) & Q(customer__username=user))
-     
         cart.delete()
         delivery_charges = 100
         amount =0.0
@@ -174,13 +175,8 @@ def remove_cart(request):
         cart_product = [p for p in Cart.objects.all() if p.customer == customer]
         for p in cart_product:
                 tempamount = (p.quantity * p.product.price)
-                print("q",p.quantity)
-                print("price",p.product.price )
-                print(tempamount)
                 amount +=tempamount
                 total_amount = amount+delivery_charges
-                
-                print("amount",amount)
     data = {
         
         'amount':amount,
@@ -260,22 +256,72 @@ def remove_cart(request):
 #     else: 
 #         return render(request, 'product/search.html', {"image":image, "dict1":dict1,'query':query, "brand_item":brand_item,"color_item":color_item})
 
-    
-    
-    
-    
-def wishlist(request):
-    ## show all wishlist item 
-    wishlist = Wishlist.objects.filter(customer__username = request.user)
-    return render(request, 'product/wishlist.html', {"wishlist":wishlist})
 
+# give all the list of products      
+class ProductList(View):
+    def get(self, request, pk):    
+        category = Category.objects.all()
+        subcatagory = SubCategory.objects.get(pk=pk)
+        category = Category.objects.all()
+        img = Image.objects.filter(product__sub__id=pk)
+        dict_category={}   
+        for item in category:
+
+            dict_category[item.name]=SubCategory.objects.filter(category__name = item.name)
+        context = {
+            'dict1':dict_category,
+            'subcatagory':subcatagory,
+            "img":img,
+            }
+        return render(request, 'product/list_product.html', context)
+        
+# It gives the detail of one perticular product
+class ProductDetail(View):
+    def get(self, request, pk,prod_id):
+        category = Category.objects.all()    
+        stripe_publishable_key = settings.STRIPE_PUBLISHABLE_KEY
+        wishlist = Wishlist.objects.filter(customer__username=request.user)
+        dict_category = {}
+        for item in category:
+            dict_category[item.name]=SubCategory.objects.filter(category__name = item.name)
+                   
+        products = Product.objects.get(id=prod_id)
+        img = Image.objects.get(pk=pk)
+        pro = img.product
+        list_item=[]
+        for item in wishlist:
+            list_item.append(item.product)
+            
+        flag= False
+        if pro in list_item:
+            flag= True
+        else:
+            flag = False
+        
+        rattings = Ratting.objects.filter(product__image__id=pk).order_by('-id')[:5]
+        average_rating = rattings.aggregate(Avg('ratting'))['ratting__avg']
+        context = {"products":products,
+                "img":img,
+                'category':category, 
+                'dict1':dict_category,
+                "flag":flag, 
+                "stripe_publishable_key":stripe_publishable_key,
+                "average_rating":round(average_rating) if average_rating else 0,"rattings":rattings
+                }
+        return render(request, 'product/product_detail.html', context)
+
+    
+# vendor can manage their product
 def manage_products(request):
     approved = Vendor.objects.get(username = request.user)
     user = request.user
     images = Image.objects.filter(product__vendor__username=user)
-    
-    
-    return render(request, 'product/vendor_products.html', {"images":images,"approved":approved})
+    context = {
+        "images":images,
+        "approved":approved
+        
+    } 
+    return render(request, 'product/vendor_products.html', context)
 
 # @login_required(login_url='login')
 # def update_product_view(request,pk):
@@ -289,6 +335,7 @@ def manage_products(request):
 #     return render(request,'product/vendor_update_product.html',{'productForm':productForm})
 
 
+#vendor can update their products
 @login_required(login_url='login')
 def update_product_view(request,pk, val):
     image = Image.objects.get(id=val)
@@ -305,6 +352,7 @@ def update_product_view(request,pk, val):
             return redirect('manage-products')       
     return render(request,'product/vendor_update_product.html',{'productForm':productForm, 'img':image})
 
+# vendor can delete products
 @login_required(login_url='login')
 def delete_product_view(request,pk, val):
     product=Product.objects.get(id=pk)
@@ -313,13 +361,13 @@ def delete_product_view(request,pk, val):
     product.delete()
     return redirect('manage-products')
 
+
+# vendor can add products with multiple images
 def addProducts(request):
     productForm=ProductAddForm()
-    # img = Image.objects.get()
     if request.method=='POST':
         productForm=ProductAddForm(request.POST, request.FILES)
-        if productForm.is_valid():
-            
+        if productForm.is_valid():      
             name = productForm.cleaned_data['name']
             description = productForm.cleaned_data['description']
             price = productForm.cleaned_data['price']
@@ -327,13 +375,11 @@ def addProducts(request):
             color = productForm.cleaned_data['color']
             category = productForm.cleaned_data['category']
             sub = productForm.cleaned_data['sub']
-            
             vendor = Vendor.objects.get(username=request.user)
             product = Product(name=name,description=description, price=price,brand=brand, color=color,category=category, sub=sub, vendor=vendor)
             product.save()
             
             files = request.FILES.getlist('file')
-            print("files",files)
             if files:
                 for file in files:       
                     Image.objects.create(product = product, image=file)
@@ -341,6 +387,8 @@ def addProducts(request):
             return redirect('manage-products')
     return render(request,'product/vendor_add_products.html',{'productForm':productForm})
 
+
+# vendor can see how many orders  have come
 @login_required(login_url='login')
 def view_Order(request):
     approved = Vendor.objects.get(username = request.user)
@@ -374,7 +422,7 @@ def delete_order_status(request, pk):
     return redirect('view-order')
 
 
-
+# customer can search perticular product
 def search(request):
     dict1={}
     category = Category.objects.all()
@@ -399,30 +447,30 @@ def search(request):
             if test=='1':
                 image  = Image.objects.filter(Q(product__sub__name__icontains=query) & Q(product__price__lte=30000)) 
                
-                return render(request, 'product/search.html', {"image":image, "dict1":dict1, "query":query, "brand_item":brand_item, "color_item":color_item})
+                return render(request, 'product/product_search.html', {"image":image, "dict1":dict1, "query":query, "brand_item":brand_item, "color_item":color_item})
     
             elif test=="2":
                 image  = Image.objects.filter(Q(product__sub__name__icontains=query) & Q(product__price__gte=30000))
         
-                return render(request, 'product/search.html', {"image":image, "dict1":dict1, "query":query, "brand_item":brand_item, "color_item":color_item})
+                return render(request, 'product/product_search.html', {"image":image, "dict1":dict1, "query":query, "brand_item":brand_item, "color_item":color_item})
         
     
         else:            
             image = Image.objects.all() 
-            return render(request, 'product/search.html', {"image":image, "dict1":dict1,})
+            return render(request, 'product/product_search.html', {"image":image, "dict1":dict1,})
                
         # filter by brand
         if 'brand' in request.GET:
             var2 = request.GET.get('brand')
             image = Image.objects.filter(product__brand=var2)
-            return render(request, 'product/search.html', {"image":image, "dict1":dict1, "query":query, "brand_item":brand_item, "color_item":color_item})
+            return render(request, 'product/product_search.htmlearch.html', {"image":image, "dict1":dict1, "query":query, "brand_item":brand_item, "color_item":color_item})
         
         # filter by color
         if "color" in request.GET:
             color = request.GET.get('color')
             print(color)
             image = Image.objects.filter(Q(product__sub__name__icontains=query) & Q(product__color__icontains=color))
-            return render(request, 'product/search.html', {"image":image, "dict1":dict1, "query":query, "brand_item":brand_item, "color_item":color_item})
+            return render(request, 'product/product_search.html', {"image":image, "dict1":dict1, "query":query, "brand_item":brand_item, "color_item":color_item})
         
         # sort
         if "sort" in request.GET:
@@ -431,22 +479,68 @@ def search(request):
             if sort=='1':
                 image = Image.objects.filter(Q(product__sub__name__icontains=query)|Q(product__category__name__icontains=query)).order_by("product__price")
                 
-                return render(request, 'product/search.html', {"image":image, "dict1":dict1, "query":query, "brand_item":brand_item, "color_item":color_item})
+                return render(request, 'product/product_search.html', {"image":image, "dict1":dict1, "query":query, "brand_item":brand_item, "color_item":color_item})
                 
             if sort=='2':
                 image = Image.objects.filter(Q(product__sub__name__icontains=query)| Q (product__category__name__icontains=query)).order_by("-product__price")
-                return render(request, 'product/search.html', {"image":image, "dict1":dict1, "query":query, "brand_item":brand_item, "color_item":color_item})
+                return render(request, 'product/product_search.html', {"image":image, "dict1":dict1, "query":query, "brand_item":brand_item, "color_item":color_item})
                 
             
     image = Image.objects.filter(Q(product__category__name__icontains=query)|Q(product__sub__name__icontains=query)).order_by('id')
-    paginator = Paginator(image, 3)
-    page_number =  request.GET.get('page')
-    print("pagenumber", page_number)
-    page_obj = paginator.get_page(page_number)
-    print("page", page_obj)
     
+    print("image", image)
+    for im in image:
+        print(im.id)
         
     if query == "":
-            return render(request, 'product/search.html', {"image":image, "dict1":dict1,'query':query,})
+            return render(request, 'product/product_search.html', {"image":image, "dict1":dict1,'query':query,})
     else: 
-        return render(request, 'product/search.html', {"image":image, "dict1":dict1,'query':query, "brand_item":brand_item,"color_item":color_item, "page_obj":page_obj})
+        return render(request, 'product/product_search.html', {"image":image, "dict1":dict1,'query':query, "brand_item":brand_item,"color_item":color_item,})
+
+class TrackDetail(DetailView):
+ 
+    model = Product
+    template_name = "product/track_detail.html"
+    def get_context_data(self, **kwargs,):
+        pk=self.kwargs.get('pk')
+        item_id = self.kwargs.get('item_id')
+        print(item_id)
+        context = super(TrackDetail, self).get_context_data(**kwargs)
+        context['image'] = Image.objects.get(product__id = pk)
+        # context['order'] = OrderDetail.objects.filter(product__id = pk,customer=self.request.user)     
+        context['order'] = OrderDetail.objects.get(id=item_id)     
+        context['rattings'] = Ratting.objects.filter(customer=self.request.user, product__id=pk, order__id=item_id)
+
+        return context
+    
+class OrderHistoryView(View):
+    def get(self, request):
+        print(request.user)
+        model = OrderDetail.objects.filter(customer__username=request.user)
+        return render(request, 'product/order_history.html', {"object_list":model})
+      
+
+class CancelOrder(View):
+    def get(self, request, product_id, image_id, order_id ):
+      image = Image.objects.get(pk=image_id)  
+      form = CancelOrderForm()
+      return render(request, 'product/order_cancel.html', {"form":form, "image":image})
+      
+    def post(self, request, product_id, image_id, order_id):
+      
+      form = CancelOrderForm(request.POST)
+      order = OrderDetail.objects.get(id=order_id)
+      if form.is_valid():  
+        order.has_paid=False
+        order.save()  
+        subject = 'Order Cancel'
+        message = f'Your order has been cancel .. Your Paymnet will send to your account within 5 to 6 working day'
+        email_from = settings.EMAIL_HOST_USER
+        # recipient_list = [session['customer_details']['email'] ]
+        recipient_list = ['arit2000roy@gmail.com' ]
+        
+        send_mail( subject, message, email_from, recipient_list ) 
+        print("Emailing customer")
+        
+    
+        return render(request,'product/order_cancel_successfully.html')

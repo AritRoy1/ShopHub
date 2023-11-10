@@ -17,4 +17,3 @@ class VendorAdmin(admin.ModelAdmin):
 class MultipleAddressAdmin(admin.ModelAdmin):
     list_display = ['id', 'name','phone_number', 'pincode', 'locality', 'address', 'city', 'state', 'customer','vendor']
     
-   

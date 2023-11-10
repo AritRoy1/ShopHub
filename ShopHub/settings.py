@@ -140,7 +140,7 @@ MEDIA_URL = "/media/"
 
 AUTH_USER_MODEL = 'customer.User'
 
-## stripe key for payment interface
+
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_USE_TLS = True
@@ -148,7 +148,7 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = 'arit.roy@codiatic.com'
 EMAIL_HOST_PASSWORD = "ljhh vsvp ecxo olhz"
 
-
+## stripe key for payment interface
 if DEBUG:
     STRIPE_PUBLISHABLE_KEY = 'pk_test_51O7YL4SGxHVPIDmncIeC8vJ70xgUQshpLP5t5GueQYpGJMxiSpV7sqRzvAEvQBRr1KvKQySmQm2LF176v1Fyae2700hk3l1i2W'
     STRIPE_SECRET_KEY = 'sk_test_51O7YL4SGxHVPIDmnKQE8W0m37a4RergVxdNcyZafecuk6MHL9lvU0jGvcCK7WVS2LtzgqLUNGMsK9Lgk8m1kp2lD002wjIhDH7'

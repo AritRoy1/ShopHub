@@ -3,12 +3,12 @@ from .models import Product
 from django.contrib.auth.forms import AuthenticationForm, UsernameField, UserCreationForm
 from customer.models import Vendor
 from payment.models import OrderDetail
+from payment.models import CancelOrder
 
 class ProductUpdateForm(forms.ModelForm):
     class Meta:
         model = Product
         fields = ['name', 'description', 'price', 'brand', 'color']
-
 
 
 class VendorRegistrationForm(UserCreationForm):
@@ -18,14 +18,21 @@ class VendorRegistrationForm(UserCreationForm):
                   'phone_number','address', 'city', 'state', 'zip_code', 'aadhar_number', 'ac_number'
                   , 'gst_invoice']
         widgets = {'address':forms.Textarea(attrs={'cols':34, 'rows':4})}
+ 
         
 class ProductAddForm(forms.ModelForm):
-    # images = forms.ImageField(widget=forms.ClearableFileInput(attrs={'multiple': True}))
     class Meta:
         model = Product
         fields = ['name', 'description', 'price', 'brand', 'color', 'category', 'sub']
+ 
         
 class UpdateOrderForm(forms.ModelForm):
     class Meta:
         model = OrderDetail
         fields = ['status']
+
+
+class CancelOrderForm(forms.ModelForm):
+    class Meta:
+        model = CancelOrder
+        fields = ['reasion']
