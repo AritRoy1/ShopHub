@@ -96,7 +96,8 @@
 <b style="font-size: xx-large;"> Best {{page.0}} For You</b> <br> <br>
 
     {% for item in page.1 %}
-    <a href="{% url 'product-detail' item.id %}"> <img src=" {{item.image.url}}" alt="" height="300px" width="300px">
+   
+    <a href="{% url 'product-detail' item.id item.product.id %}"> <img src=" {{item.image.url}}" alt="" height="300px" width="300px">
       <b>From Rs.</b>{{item.product.price}}
     </a>
 

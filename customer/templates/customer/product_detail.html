@@ -28,19 +28,59 @@
 .checked {
     color: orange;
 }
-</style>
-<h1>{{img.product.sub.name}}</h1>
 
-<div class="row ml-3">
-  <div class="col-sm-3" style="background-color: lightblue;">
-    <img src="{{ img.image.url }}" width="300px" height="400" alt="not" />
+
+</style>
+
+
+<h1>{{img.product.sub.name}}</h1> <br>
+
+
+
+<div class="row ml-4">
+  <div class="col-sm-4" style="background-color: lightblue;">
+
+    {% comment %} <img src="{{ img.image.url }}" width="300px" height="400" alt="not" /> {% endcomment %}
+
+
+    <div >
+
+      <div align="left"  id="carouselExampleControls" class="carousel slide" data-ride="carousel">
+          <div class="carousel-inner">
+              {% for image in products.image_set.all %}
+              
+                  <div style="background-color:#f1ecec" class="carousel-item {% if forloop.counter == 1 %}active{% endif %}">
+                      <img style="width: auto;height: 700px;padding: 2px;" src="{{image.image.url}}" alt="Image not available" />
+                  </div>
+              {% empty %}
+                  <h5>Image not available</h5>
+              {% endfor %}
+          </div>
+          <a class="carousel-control-prev" href="#carouselExampleControls" role="button" data-slide="prev">
+              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+              <span class="sr-only">Previous</span>
+          </a>
+          <a class="carousel-control-next" href="#carouselExampleControls" role="button" data-slide="next">
+              <span class="carousel-control-next-icon" aria-hidden="true"></span>
+              <span class="sr-only">Next</span>
+          </a>
+      </div>
+  </div>
+    
+   
+
+
+
+
+
+
+
     <br/>
     <form action="/product/add-to-cart"> 
       {% csrf_token %}
         <div class="cont">
         <input type="hidden" name="prod_id" value="{{img.id}}" id="prod_id">
         <button type="submit" class="btn btn-warning shadow px-5 py-2">Add To Cart</button>
-        {% comment %} <button type="submit" class="btn btn-info shadow px-5 py-2" id="checkout-button" >Buy Now</button> {% endcomment %}
         
         
       </div>
@@ -49,10 +89,8 @@
 
     
 
-  <div class="product float-right"  style="position: relative; top:-447px">
+  <div class="product float-right"  style="position: relative; top:-787px">
     <button class="wishlist-button {% if flag %} added {% endif %}"  data-product-id="{{ img.id }}"><i class="fa fa-heart heart-icon"></i></button>
-
-
 
   </div>
     
@@ -72,6 +110,7 @@
 </div> <br><br>
 
 
+{% comment %} add rattings   {% endcomment %}
 
  
  <h3 class="card-title">Avg rating:
@@ -186,6 +225,8 @@
 
   {% comment %} show more review {% endcomment %}
 
+
+
 <script>
     var page = 2;  // Initial page for loading more reviews
   
@@ -210,5 +251,34 @@
   </script>
   
 
+  {% comment %} crasoul {% endcomment %}
 
+
+<script>
+
+var myCarousel = document.querySelector('#myCarousel')
+var carousel = new bootstrap.Carousel(myCarousel, {
+  interval: 100000
+})
+
+$('.carousel .carousel-item').each(function(){
+    var minPerSlide = 4;
+    var next = $(this).next();
+    if (!next.length) {
+    next = $(this).siblings(':first');
+    }
+    next.children(':first-child').clone().appendTo($(this));
+    
+    for (var i=0;i<minPerSlide;i++) {
+        next=next.next();
+        if (!next.length) {
+            next = $(this).siblings(':first');
+        }
+        
+        next.children(':first-child').clone().appendTo($(this));
+      }
+});
+
+
+</script>
 {% endblock product-details %}

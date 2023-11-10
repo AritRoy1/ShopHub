@@ -39,6 +39,7 @@ def home(request):
 
 
     # after pagination
+    product = Product.objects.all()
     category = Category.objects.all()
     subcatagory = SubCategory.objects.all()   
     image = Image.objects.all()
@@ -57,7 +58,18 @@ def home(request):
     page_number =  request.GET.get('page') 
     page_obj = paginator.get_page(page_number)
     
-    return render(request, 'customer/home.html', {'category':category, "dict1":dict1, "dict2":dict2,  'image':image, 'subactegory':subcatagory,"page_obj":page_obj})
+    context={
+        'category':category,
+        "dict1":dict1,
+        "dict2":dict2,
+        'image':image,  
+        'subactegory':subcatagory,
+        "page_obj":page_obj,
+        "product":product
+        
+    }
+    
+    return render(request, 'customer/home.html', context )
 
 
 def CustomerRegistration(request):
@@ -142,8 +154,10 @@ class ProductList(View):
     def get(self, request, pk):
         
         category = Category.objects.all()
+        
+        print("pkojj", pk)
         subcatagory = SubCategory.objects.get(pk=pk)
-        phone = Product.objects.filter(id=1)
+        product = Product.objects.filter(id=pk)
         category = Category.objects.all()
         img = Image.objects.filter(product__sub__id=pk)
         dict1={}
@@ -160,7 +174,7 @@ class ProductList(View):
 
 
 class ProductDetail(View):
-    def get(self, request, pk):
+    def get(self, request, pk,prod_id):
         category = Category.objects.all()    
         stripe_publishable_key = settings.STRIPE_PUBLISHABLE_KEY
         wishlist = Wishlist.objects.filter(customer__username=request.user)
@@ -168,7 +182,8 @@ class ProductDetail(View):
         for item in category:
             dict1[item.name]=SubCategory.objects.filter(category__name = item.name)
                    
-        phone = Product.objects.filter(id=pk)
+        products = Product.objects.get(id=prod_id)
+        print("product", products)
         
         
         img = Image.objects.get(pk=pk)
@@ -187,7 +202,7 @@ class ProductDetail(View):
         rattings = Ratting.objects.filter(product__image__id=pk).order_by('-id')[:5]
         average_rating = rattings.aggregate(Avg('ratting'))['ratting__avg']
           
-        return render(request, 'customer/product_detail.html', {"phone":phone,
+        return render(request, 'customer/product_detail.html', {"products":products,
                 "img":img, 'category':category, 'dict1':dict1, "flag":flag, "stripe_publishable_key":stripe_publishable_key, "average_rating":round(average_rating) if average_rating else 0,"rattings":rattings})
 
 def show_more_review(request):
@@ -317,3 +332,13 @@ def remove_from_wishlist(request, product_id):
         return JsonResponse({'message': 'Item removed from wishlist'})
     except Wishlist.DoesNotExist:
         return JsonResponse({'message': 'Item was not in the wishlist'})
+    
+
+
+
+def demo(request):
+    prod = Product.objects.get(id=33)
+    context={
+        "products":prod
+    }
+    return render(request, 'customer/demo.html', context)

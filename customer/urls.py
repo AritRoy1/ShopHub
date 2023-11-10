@@ -33,7 +33,7 @@ urlpatterns = [
 
     path('electronics-detail/', views.ProductDetail.as_view() ,name='Electronics'),
     path('product-list/<int:pk>', views.ProductList.as_view(), name="product-list"),
-    path('product-detail/<int:pk>', views.ProductDetail.as_view(), name='product-detail'),
+    path('product-detail/<int:pk>/<int:prod_id>', views.ProductDetail.as_view(), name='product-detail'),
     path("show-more-review/", views.show_more_review, name="show-review"),
     path("profile/", views.CustomerProfile.as_view(), name="profile"),
     path("address/", views.address, name = 'address'),
@@ -45,7 +45,7 @@ urlpatterns = [
 
     
     
-   
+   path("demo/", views.demo, name='demo'),
     
         
 ]
