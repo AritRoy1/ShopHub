@@ -10,6 +10,8 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
+from django.core.mail import send_mail
+from ShopHub import settings
 
 # import ratting for product_detail
 from ratting.models import Ratting
@@ -66,14 +68,12 @@ def CustomerRegistration(request):
         form = CustomerRegistrationForm(request.POST)
         if form.is_valid():
             form.save()
+          
             return HttpResponseRedirect('/login/')           
     else:
         form = CustomerRegistrationForm()
-        context = {
-            "form": form
-            
-        }
-    return render(request, 'customer/customer_registration.html', context)
+       
+    return render(request, 'customer/customer_registration.html', {"form":form})
 
 ## login form 
 
@@ -166,7 +166,8 @@ class CustomerProfile(View):
         form = CustomerProfileForm(request.POST, instance=request.user.customer)      
         if form.is_valid():      
             form.save()
-            return redirect('/profile/')
+           
+            return HttpResponseRedirect('/customer-profile/')
         
         
 # customer can see their address      

@@ -1,0 +1,227 @@
+{% extends "product/vendor_base.html" %} {% block content %}
+
+<div class="row mt-2">
+  <div class="col-md-4"></div>
+
+  <div class="col-md-3">
+    <h1>Product Chart</h1>
+
+    <div>
+      <canvas id="myChart"></canvas>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+      const ctx1 = document.getElementById('myChart');
+
+      new Chart(ctx1, {
+        type: 'bar',
+        data: {
+          labels: [{% for product,count in subcategory.items %} '{{product}}', {% endfor %}],
+          datasets: [{
+            label: '# of Votes',
+            data: [{% for sub, count in subcategory.items %} {{ count }}, {% endfor %}],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      });
+    </script>
+  </div>
+</div>
+ <br><br> <br> <br> <hr>
+
+
+<div class="row mt-2">
+    <div class="col-md-4"></div>
+  
+    <div class="col-md-3">
+      <h1>How Many Product Sell Per Day</h1>
+
+  
+      <div>
+        <canvas id="linechart"></canvas>
+      </div>
+  
+      <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+      <script>
+        const ctx2 = document.getElementById('linechart');
+  
+        new Chart(ctx2, {
+          type: 'line',
+          data: {
+            labels: [{% for product,count in count_product_per_day.items %} '{{product}}', {% endfor %}],
+            datasets: [{
+              label: '# of Votes',
+              data: [{% for sub, count in count_product_per_day.items %} {{ count }}, {% endfor %}],
+              borderWidth: 1
+            }]
+          },
+          options: {
+            scales: {
+              y: {
+                beginAtZero: true
+              }
+            }
+          }
+        });
+      </script>
+    </div>
+  </div>
+
+  <br> <br> <br> <br> <hr>
+
+  {% comment %} <div class="row mt-2">
+    <div class="col-md-4"></div>
+  
+    <div class="col-md-4">
+        <h1>Profit Chart</h1>
+  
+      <div>
+        <canvas id="cellchart"></canvas>
+      </div>
+  
+      <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+      <script>
+        const ctx3 = document.getElementById('cellchart');
+  
+        new Chart(ctx3, {
+          type: 'bar',
+          data: {
+            labels: ['amount'],
+            datasets: [{
+              label: 'Profit',
+              data: [{{amount}}],
+              backgroundColor: 'rgba(75, 192, 192, 0.2)', // Customize the background color
+              borderColor: 'rgba(75, 192, 192, 1)',
+              borderWidth: 1
+            }]
+          },
+          options: {
+            scales: {
+              y: {
+                beginAtZero: true
+              }
+            }
+          }
+        });
+      </script>
+    </div>
+  </div> {% endcomment %}
+
+
+
+
+  {% comment %} <div class="row mt-2">
+    <div class="col-md-4"></div>
+
+    <div class="col-md-8">
+        <h1>Weekly Profit Chart</h1>
+
+        <div>
+            <canvas id="weeklyChart"></canvas>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const ctxWeekly = document.getElementById('weeklyChart');
+
+                const uniqueWeeks = Array.from(new Set([{% for entry in products_by_week %} '{{ entry.week|date:"Y-W" }}', {% endfor %}]));
+
+                const datasetsWeekly = uniqueWeeks.map(week => {
+                    return {
+                        label: week,
+                        data: [{% for entry in products_by_week %}{% if entry.week|date:"Y-W" == week %} {{ entry.total_quantity }},{% else %} 0,{% endif %}{% endfor %}],
+                        borderWidth: 1,
+                    };
+                });
+
+                new Chart(ctxWeekly, {
+                    type: 'bar',
+                    data: {
+                        labels: [{% for entry in products_by_week %} '{{ entry.week|date:"Y-W" }}', {% endfor %}],
+                        datasets: datasetsWeekly,
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top',
+                            },
+                        }
+                    }
+                });
+            });
+        </script>
+    </div>
+</div> {% endcomment %}
+
+<div class="row mt-2">
+    <div class="col-md-4"></div>
+
+    <div class="col-md-8">
+        <h1>Weekly Profit Chart</h1>
+
+        <div>
+            <canvas id="weeklyChart"></canvas>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const ctxWeekly = document.getElementById('weeklyChart');
+
+                const uniqueWeeks = Array.from(new Set([{% for entry in orders_by_week %} '{{ entry.week|date:"Y-W" }}', {% endfor %}]));
+
+                const datasetsWeekly = uniqueWeeks.map(week => {
+                    return {
+                        label: week,
+                        data: [{% for entry in orders_by_week %}{% if entry.week|date:"Y-W" == week %} {{ entry.total_amount }},{% else %} 0,{% endif %}{% endfor %}],
+                        borderWidth: 1,
+                    };
+                });
+
+                new Chart(ctxWeekly, {
+                    type: 'bar',
+                    data: {
+                        labels: [{% for entry in orders_by_week %} '{{ entry.week|date:"Y-W" }}', {% endfor %}],
+                        datasets: datasetsWeekly,
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top',
+                            },
+                        }
+                    }
+                });
+            });
+        </script>
+    </div>
+</div>
+
+
+{% endblock content %}

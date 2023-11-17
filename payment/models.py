@@ -26,6 +26,7 @@ class OrderDetail(models.Model):
     updated_on = models.DateTimeField(auto_now_add=True)
     
     
+    
 REASION_FOR_CANCEL=[
     ("EXD","Expected delivery date has changed and the product is arriving at a later date."),
     ('PRA.',"Product is not required anymore."),

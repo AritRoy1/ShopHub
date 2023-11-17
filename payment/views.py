@@ -12,6 +12,7 @@ from django.views.decorators.csrf import csrf_exempt
 import json
 from customer.models import Customer
 from django.core.mail import send_mail
+from django.urls import reverse
 
 
 # Create your views here.
