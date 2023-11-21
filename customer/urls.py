@@ -10,7 +10,7 @@ from django.contrib.auth.views import (
 
 urlpatterns = [
     
-    path('home/',views.home, name="home"),
+    path('',views.home, name="home"),
     path('customer/registration/', views.CustomerRegistration, name='customer-registration'),    
     path('login/', views.Login.as_view(), name= 'login'),
     path('logout/', views.logout_view, name='logout'),
@@ -33,6 +33,4 @@ urlpatterns = [
     path("wishlist/", views.wishlist, name='wishlist'),
     
     
-    
-        
 ]

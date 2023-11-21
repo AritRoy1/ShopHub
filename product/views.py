@@ -1,15 +1,11 @@
 from django.shortcuts import render, redirect
 from django.views import View
 from .forms import ProductUpdateForm, ProductAddForm, VendorRegistrationForm, CancelOrderForm
-from django.http import HttpResponse , HttpResponseRedirect
 from .models import Product, Cart, Category, SubCategory, Image, Wishlist
 from customer.models import Customer, Vendor
 from django.db.models import Q
 from django.db.models import Count
-
 from django.http import JsonResponse
-from django.contrib.postgres.search import SearchVector, SearchQuery
-
 from django.contrib.auth.decorators import login_required 
 from payment.models import OrderDetail
 from .forms import UpdateOrderForm
@@ -23,18 +19,16 @@ from datetime import datetime, date
 from payment.models import OrderDetail
 from django.db.models.functions import TruncWeek
 from django.db.models import Sum
-
+from django.shortcuts import get_object_or_404
 
 # vendor registration view
 def VendorRegistration(request):
+    form = VendorRegistrationForm()
     if request.method == "POST":
         form = VendorRegistrationForm(request.POST, request.FILES)
         if form.is_valid():     
             form.save()
-            return HttpResponseRedirect('/login/')
-             
-    else:        
-        form = VendorRegistrationForm()     
+            return redirect('vendor-pannel')           
     return render(request, 'product/vendor_registration_form.html', {"form":form})
 
 
@@ -43,18 +37,6 @@ def vendor_pannel(request):
     approved = Vendor.objects.get(username = request.user)
     return render(request, 'product/vendor_base.html', {"approved":approved})
 
-
-# class ProductRegistration(View):
-#     def get(self, request):
-#         form =ProductUpdateForm
-#         return render(request, 'product/product.html', {"form":form})
-    
-#     def post(self, request):
-#         form =ProductUpdateForm(request.POST, request.FILES)
-#         if form.is_valid():
-#             form.save()
-#             return HttpResponse("sucessfully Submited")
-        
         
 @login_required(login_url='login')
 def add_to_cart(request):
@@ -72,11 +54,14 @@ def add_to_cart(request):
         
     # if the product is already in cart than redirect to show cart page 
     if product in cart_list:
+        print("1")
         return redirect('/product/show-cart')
     else:
         
         # if the product is not in cart than save it and redirect to show cart page       
         cart.save() 
+        print("2")
+        
         return redirect('/product/show-cart') 
    
     
@@ -86,7 +71,6 @@ def show_cart(request):
     dict_category = {}
     for item in category:
         dict_category[item.name]=SubCategory.objects.filter(category__name = item.name)
-        
     if request.user.is_authenticated:
         user = request.user
         cart = Cart.objects.filter(customer=user) 
@@ -95,7 +79,6 @@ def show_cart(request):
         total_amount = 0.0
         customer = Customer.objects.get(username=user)
         cart_product = [cart for cart in Cart.objects.all() if cart.customer == customer]
-        
         if cart_product:
             for val in cart_product:
                 tempamount = (val.quantity * val.product.price)
@@ -268,7 +251,6 @@ class ProductList(View):
     def get(self, request, pk):    
         category = Category.objects.all()
         subcatagory = SubCategory.objects.get(pk=pk)
-        category = Category.objects.all()
         img = Image.objects.filter(product__sub__id=pk)
         dict_category={}   
         for item in category:
@@ -282,19 +264,20 @@ class ProductList(View):
         return render(request, 'product/list_product.html', context)
         
 # It gives the detail of one perticular product
+
 class ProductDetail(View):
     def get(self, request, pk,prod_id):
-        category = Category.objects.all()    
+        category = Category.objects.all() 
         stripe_publishable_key = settings.STRIPE_PUBLISHABLE_KEY
         wishlist = Wishlist.objects.filter(customer__username=request.user)
         dict_category = {}
         for item in category:
-            dict_category[item.name]=SubCategory.objects.filter(category__name = item.name)
+            dict_category[item.name] = SubCategory.objects.filter(category__name = item.name)
                    
-        products = Product.objects.get(id=prod_id)
-        img = Image.objects.get(pk=pk)
+        products = get_object_or_404(Product,id=prod_id)
+        img = get_object_or_404(Image,pk=pk)
         pro = img.product
-        list_item=[]
+        list_item = []
         for item in wishlist:
             list_item.append(item.product)
             
@@ -328,23 +311,38 @@ def manage_products(request):
     } 
     return render(request, 'product/vendor_products.html', context)
 
-# @login_required(login_url='login')
-# def update_product_view(request,pk):
-#     product=Product.objects.get(id=pk)
-#     productForm=ProductForm(instance=product)
-#     if request.method=='POST':
-#         productForm=ProductForm(request.POST,request.FILES,instance=product)
-#         if productForm.is_valid():
-#             productForm.save()
-#             return redirect('vendor-products')
-#     return render(request,'product/vendor_update_product.html',{'productForm':productForm})
+# vendor can add products with multiple images
+def addProducts(request):
+    productForm=ProductAddForm()
+
+    if request.method=='POST':
+        productForm=ProductAddForm(request.POST, request.FILES)
+        if productForm.is_valid():   
+            name = productForm.cleaned_data['name']
+            description = productForm.cleaned_data['description']
+            price = productForm.cleaned_data['price']
+            brand = productForm.cleaned_data['brand']
+            color = productForm.cleaned_data['color']
+            category = productForm.cleaned_data['category']
+            sub = productForm.cleaned_data['sub']
+            vendor = Vendor.objects.get(username=request.user)
+            product = Product(name=name,description=description, price=price,brand=brand, color=color,category=category, sub=sub, vendor=vendor)
+            product.save()
+            
+            files = request.FILES.getlist('file')
+            if files:
+                for file in files:       
+                    Image.objects.create(product = product, image=file)
+            
+            return redirect('manage-products')
+    return render(request,'product/vendor_add_products.html',{'productForm':productForm})
 
 
 #vendor can update their products
 @login_required(login_url='login')
 def update_product_view(request,pk, val):
     image = Image.objects.get(id=val)
-    product = Product.objects.get(id=pk)    
+    product = Product.objects.get(id=pk)   
     productForm=ProductUpdateForm(instance=product)
     if request.method=='POST':
         productForm=ProductUpdateForm(request.POST,request.FILES, instance=product)      
@@ -367,32 +365,6 @@ def delete_product_view(request,pk, val):
     return redirect('manage-products')
 
 
-# vendor can add products with multiple images
-def addProducts(request):
-    productForm=ProductAddForm()
-    if request.method=='POST':
-        productForm=ProductAddForm(request.POST, request.FILES)
-        if productForm.is_valid():      
-            name = productForm.cleaned_data['name']
-            description = productForm.cleaned_data['description']
-            price = productForm.cleaned_data['price']
-            brand = productForm.cleaned_data['brand']
-            color = productForm.cleaned_data['color']
-            category = productForm.cleaned_data['category']
-            sub = productForm.cleaned_data['sub']
-            vendor = Vendor.objects.get(username=request.user)
-            product = Product(name=name,description=description, price=price,brand=brand, color=color,category=category, sub=sub, vendor=vendor)
-            product.save()
-            
-            files = request.FILES.getlist('file')
-            if files:
-                for file in files:       
-                    Image.objects.create(product = product, image=file)
-            
-            return redirect('manage-products')
-    return render(request,'product/vendor_add_products.html',{'productForm':productForm})
-
-
 # vendor can see how many orders  have come
 @login_required(login_url='login')
 def view_Order(request):
@@ -404,10 +376,30 @@ def view_Order(request):
         'image':image,
         'approved':approved
     }
+    print("order")
     
     return render(request, 'product/vendor_looking_order.html', context)
  
- #######################################
+ 
+def update_order_status(request, pk):
+    instance = OrderDetail.objects.get(pk=pk)
+    if request.method =="POST":
+        form = UpdateOrderForm(request.POST, instance=instance)
+        if form.is_valid():
+            form.save()
+            return redirect('view-order')
+        
+    else:
+        form = UpdateOrderForm(instance=instance)
+    return render(request, 'product/update_status.html', {"form":form})
+
+
+def delete_order(request, pk):
+    order = OrderDetail.objects.get(pk=pk)
+    order.delete()
+    return redirect('view-order') 
+ 
+ 
  
 def graph_Bar(request):
     # show how many product vendor have 
@@ -450,24 +442,6 @@ def graph_Bar(request):
     }
     return render(request, "product/vendor_graph.html", context)
 
-##########################################
-
-def update_order_status(request, pk):
-    instance = OrderDetail.objects.get(pk=pk)
-    if request.method =="POST":
-        form = UpdateOrderForm(request.POST, instance=instance)
-        if form.is_valid():
-            form.save()
-            return redirect('view-order')
-        
-    else:
-        form = UpdateOrderForm(instance=instance)
-    return render(request, 'product/update_status.html', {"form":form})
-
-def delete_order_status(request, pk):
-    order = OrderDetail.objects.get(pk=pk)
-    order.delete()
-    return redirect('view-order')
 
 
 # customer can search perticular product
@@ -591,9 +565,15 @@ def search(request):
 
 
 class TrackDetail(DetailView):
+    
     model = Product
     template_name = "product/track_product.html"
     def get_context_data(self, **kwargs,):
+        category = Category.objects.all()
+        dict_category = {}
+        for item in category:
+            dict_category[item.name]=SubCategory.objects.filter(category__name = item.name)
+        
         pk=self.kwargs.get('pk')
         item_id = self.kwargs.get('item_id')
         print(item_id)
@@ -602,14 +582,23 @@ class TrackDetail(DetailView):
         # context['order'] = OrderDetail.objects.filter(product__id = pk,customer=self.request.user)     
         context['order'] = OrderDetail.objects.get(id=item_id)     
         context['rattings'] = Ratting.objects.filter(customer=self.request.user, product__id=pk, order__id=item_id)
-
+        context['dict1'] = dict_category
         return context
   
 # customer can see their order history   
 class OrderHistoryView(View):
+    category = Category.objects.all()
+    dict_category = {}
+    for item in category:
+        dict_category[item.name]=SubCategory.objects.filter(category__name = item.name)
+        
     def get(self, request):
         model = OrderDetail.objects.filter(customer__username=request.user)
-        return render(request, 'product/order_history.html', {"object_list":model})
+        context = {
+            "object_list":model,
+            "dict1":self.dict_category
+        }
+        return render(request, 'product/order_history.html', context)
       
 # customer can cancel there order 
 class CancelOrder(View):

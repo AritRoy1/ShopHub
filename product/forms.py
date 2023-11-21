@@ -16,7 +16,7 @@ class VendorRegistrationForm(UserCreationForm):
         model = Vendor
         fields = ['username', 'first_name', 'last_name', 'email', 'birth_date',
                   'phone_number','address', 'city', 'state', 'zip_code', 'aadhar_number', 'ac_number'
-                  , 'gst_invoice']
+                  ,]
         widgets = {'address':forms.Textarea(attrs={'cols':34, 'rows':4})}
  
         

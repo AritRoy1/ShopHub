@@ -79,6 +79,7 @@ STATE_CHOICES = (
    ("WB","West Bengal")
 )
 
+
 class MultipleAddress(models.Model):
     """Add Multiple Address Model"""
     

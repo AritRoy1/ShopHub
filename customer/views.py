@@ -12,6 +12,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.core.mail import send_mail
 from ShopHub import settings
+from django.utils.decorators import method_decorator
 
 # import ratting for product_detail
 from ratting.models import Ratting
@@ -51,6 +52,7 @@ def home(request):
     paginator = Paginator(dict_list, 3, orphans=1)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
+    
     context = {
         'category': category,
         "dict1": dict_category,
@@ -64,15 +66,12 @@ def home(request):
 
 
 def CustomerRegistration(request):
+    form = CustomerRegistrationForm()
     if request.method == "POST":
         form = CustomerRegistrationForm(request.POST)
         if form.is_valid():
-            form.save()
-          
-            return HttpResponseRedirect('/login/')           
-    else:
-        form = CustomerRegistrationForm()
-       
+            form.save()  
+            return HttpResponseRedirect('/login/')               
     return render(request, 'customer/customer_registration.html', {"form":form})
 
 ## login form 
@@ -123,7 +122,7 @@ class Login(View):
                 if Vendor.objects.filter(username=request.user):
                     return HttpResponseRedirect('/product/vendor-pannel/')
                 else:   
-                    return HttpResponseRedirect('/home/')      
+                    return redirect('/')      
         else:
             context={     
                     'message':"username password not match",
@@ -147,28 +146,61 @@ def show_more_review(request):
       return JsonResponse(data)
   
 # customer can see their own profile
+
+# class CustomerProfile(View):
+#     category = Category.objects.all()
+#     dict_category = {}
+#     for item in category:
+#         dict_category[item.name] = SubCategory.objects.filter(category__name = item.name)
+        
+#     def get(self, request):    
+#         form =CustomerProfileForm(instance=request.user.customer if hasattr(request.user, 'customer') else None) 
+#         context = {
+#             'form': form, 
+#             'dict1': self.dict_category
+#             } 
+#         return render(request, 'customer/customer_profile.html', context)
+    
+#     def post(self, request):
+#         form = CustomerProfileForm(request.POST, instance=request.user.customer if hasattr(request.user, 'customer') else None)      
+#         if form.is_valid():      
+#             form.save()   
+#             return HttpResponseRedirect('/customer-profile/')
+        
+
+
 class CustomerProfile(View):
     category = Category.objects.all()
     dict_category = {}
     for item in category:
-        dict_category[item.name] = SubCategory.objects.filter(category__name = item.name)
-        
-    def get(self, request):    
-        customer_data = Customer.objects.get(username = request.user)
-        form =CustomerProfileForm(instance=request.user.customer) 
+        dict_category[item.name] = SubCategory.objects.filter(category__name=item.name)
+
+    def get(self, request):
+        print("get")
+        form = CustomerProfileForm(instance=request.user.customer if hasattr(request.user, 'customer') else None)
         context = {
-            'form': form, 
+            'form': form,
             'dict1': self.dict_category
-            } 
+        }
         return render(request, 'customer/customer_profile.html', context)
-    
+
     def post(self, request):
-        form = CustomerProfileForm(request.POST, instance=request.user.customer)      
-        if form.is_valid():      
-            form.save()
-           
-            return HttpResponseRedirect('/customer-profile/')
-        
+        if request.user.is_authenticated:
+            print("post")
+            form = CustomerProfileForm(request.POST, instance=request.user.customer if hasattr(request.user, 'customer') else None)
+            if form.is_valid():
+                form.save()
+                print("regirection")
+                return redirect('/customer-profile')
+        else:
+            form = CustomerProfileForm(request.POST)
+            
+        context = {
+            'form': form,
+            'dict1': self.dict_category
+            }
+        return render(request, 'customer/customer_profile.html', context)
+
         
 # customer can see their address      
 def show_address(request):      
@@ -180,7 +212,7 @@ def show_address(request):
             return render(request, 'customer/customer_show_address.html')
 
 # customer can add their multiple address     
-class  AddAddress(View):
+class AddAddress(View):
     def get(self, request):
         form =AddAddressForm()  
         return render(request, 'customer/customer_add_address.html', {'form':form})
@@ -211,8 +243,13 @@ def delete_address(request, pk):
     return redirect('/address/')  
 
 def wishlist(request):
+    category = Category.objects.all()
+    dict_category = {}
+    for item in category:
+        dict_category[item.name]=SubCategory.objects.filter(category__name = item.name)
+        
     wishlist = Wishlist.objects.filter(customer__username = request.user)
-    return render(request, 'customer/wishlist.html', {"wishlist":wishlist})
+    return render(request, 'customer/wishlist.html', {"wishlist":wishlist, "dict1":dict_category})
 
                                  
 def add_to_wishlist(request, product_id): 
@@ -231,10 +268,17 @@ def remove_from_wishlist(request, product_id):
     product=Product.objects.get(image__id=product_id)  
     user = Customer.objects.get(username=request.user)
     try:
+        print("1")
         wishlist_item = Wishlist.objects.get(customer=user, product=product, image=image)
+        print("2")
+        
         wishlist_item.delete()
+        print("3")
+        
         return JsonResponse({'message': 'Item removed from wishlist'})
+        
     except Wishlist.DoesNotExist:
+        print("4")
         return JsonResponse({'message': 'Item was not in the wishlist'})
     
     
