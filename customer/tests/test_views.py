@@ -122,11 +122,6 @@ class LoginTestCase(TestCase):
         self.assertTemplateUsed(response, 'customer/customer_profile.html')
 
         
-        # error
-        # self.assertRedirects(response, '/customer-profile/')
-        
-    
-
 class Address(TestCase):
     def setUp(self):
         # Create a test user
@@ -278,8 +273,6 @@ class WishlistTest(TestCase):
         self.client.login(username = 'testuser1', password='testpassword')    
         url = reverse('remove_from_wishlist', args=[self.image.id])     
         response = self.client.get(url)
-        print("kjhgf")
-        print(response.json())
         self.assertIsInstance(response, JsonResponse)
         self.assertEquals(response.json(), {'message':'Item was not in the wishlist'})
         

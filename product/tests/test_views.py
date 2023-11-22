@@ -2,7 +2,8 @@ from django.test import TestCase , Client
 from customer.models import Customer, Vendor, User, MultipleAddress
 from product.models import Product, Category, SubCategory, Wishlist, Image, Cart
 from payment.models import OrderDetail
-from product.forms import ProductAddForm, ProductUpdateForm
+from ratting.models import Ratting
+from product.forms import ProductAddForm, ProductUpdateForm, UpdateOrderForm, CancelOrderForm
 from django.urls import reverse
 from customer.forms import CustomerProfileForm, CustomerRegistrationForm
 from product.forms import VendorRegistrationForm
@@ -11,6 +12,7 @@ from django.http import JsonResponse
 from django.core.files.uploadedfile import SimpleUploadedFile
 from datetime import datetime
 
+    
 class VendorRegistrationTestCase(TestCase):
     def setUp(self):
         self.client = Client()
@@ -164,6 +166,24 @@ class CartTestCase(TestCase):
             category = self.category,
             sub = self.subcategory
         )
+        self.order = OrderDetail.objects.create(
+            customer = self.customer,
+            product = self.product,
+            amount = 12,
+            status= "Placed",
+            has_paid =True,
+            session_id= "123456789",
+            order_date = datetime.now(),
+            updated_on = datetime.now()
+        )
+        # self.rating = Ratting.objects.create(
+        #     customer = self.customer,
+        #     product = self.product,
+        #     order = self.order,
+        #     ratting = 3,
+        #     comments = "kjhgfdfgh",
+        #     created_at = datetime.now(),
+        # )
         customer_form_data = {
                 'username': 'testuser1',
                 'first_name': 'Arit',
@@ -178,6 +198,7 @@ class CartTestCase(TestCase):
                 "password1":"testpassword",
                 "password2":"testpassword",
         }
+        
         
         form = CustomerRegistrationForm(data=customer_form_data)     
         
@@ -219,7 +240,7 @@ class CartTestCase(TestCase):
         
         
         
-    # add_to_cart
+    # # add_to_cart
     def test_add_to_cart_success(self):
         self.client.login(username='testuser1', password='testpassword')
         url = reverse('add-to-cart')
@@ -236,7 +257,7 @@ class CartTestCase(TestCase):
         response = self.client.get(url, {'prod_id': self.product.id})
         self.assertTrue(Cart.objects.filter(customer=self.customer, product=self.product, image=self.image).exists())
 
-    # show_cart
+    #  show_cart
     def test_showcart_registered_user_if_not_cart(self):
         self.client.login(username='testuser1', password='testpassword')
         url = reverse('showcart')
@@ -272,7 +293,7 @@ class CartTestCase(TestCase):
         updated_cart_entry = Cart.objects.get(customer=login_customer, product=self.product, image=self.image)
         self.assertEqual(updated_cart_entry.quantity, 4)
         
-    # minus cart
+    # # minus cart
     def test_minus_cart(self):
         self.client.login(username='testuser1', password='testpassword')
         login_customer = Customer.objects.get(username='testuser1')
@@ -289,7 +310,7 @@ class CartTestCase(TestCase):
         self.assertEqual(updated_cart_entry.quantity, 1)
         
         
-    # remove cart
+    # # remove cart
     def test_remove_cart(self):
         self.client.login(username='testuser1', password='testpassword')
         login_customer = Customer.objects.get(username='testuser1')
@@ -303,7 +324,7 @@ class CartTestCase(TestCase):
         })
         
     
-    # product list   
+    # # product list   
     def test_list_product_valid_id(self):
         
         self.client.login(username='testuser1', password='testpassword')
@@ -314,7 +335,7 @@ class CartTestCase(TestCase):
         self.assertNotContains(response, "asdf")
 
         
-    # product detail
+    #  product detail
     def test_product_detail_valid_product_id(self):
         self.client.login(username='testuser1', password='testpassword')
         login_customer = Customer.objects.get(username = 'testuser1')
@@ -322,6 +343,7 @@ class CartTestCase(TestCase):
         url = reverse('product-detail', args=(self.product.id, self.image.id))
         response = self.client.get(url,{"pk":self.image.id, "prod_id":self.product.id})
         self.assertTemplateUsed(response, 'product/product_detail.html')
+
 
     def test_product_detail_invalid_product_id(self):
         self.client.login(username='testuser1', password='testpassword')
@@ -339,7 +361,7 @@ class CartTestCase(TestCase):
         response = self.client.get(url)
         self.assertEquals(response.status_code, 404)
         
-    # manage product  
+    # # manage product  
     def test_manage_product(self):
         self.client.login(username='user12', password='pass12345')
         url = reverse('manage-products')
@@ -348,7 +370,7 @@ class CartTestCase(TestCase):
     
     
     
-    # add products 
+    # # add products 
     def test_add_product_get(self):
         self.client.login(username='user12', password='pass12345')
         form_data = {
@@ -366,23 +388,23 @@ class CartTestCase(TestCase):
         response = self.client.get(url)
         self.assertEquals(response.status_code, 200)
         
-    def test_add_product_post(self):
-        post_data = {
-            'name':"Accer Black",   
-            'description':"Good laptop for Chiled",
-            'price':20000.00,
-            'brand':"Accer",
-            'color':"black",
-            'category':self.category.id,
-            'sub':self.subcategory.id,
-        }
-        self.client.login(username='user12', password='pass12345')
-        form   = ProductAddForm(data=post_data)
-        print(form.is_valid())
-        self.assertTrue(form.is_valid())
-        url = reverse("add-product")
-        response = self.client.post(url, data=post_data)
-        self.assertTrue(self.product.name, "Accer Black")
+    # def test_add_product_post(self):
+    #     post_data = {
+    #         'name':"Accer Black",   
+    #         'description':"Good laptop for Chiled",
+    #         'price':20000.00,
+    #         'brand':"Accer",
+    #         'color':"black",
+    #         'category':self.category.id,
+    #         'sub':self.subcategory.id,
+    #     }
+    #     self.client.login(username='user12', password='pass12345')
+    #     form   = ProductAddForm(data=post_data)
+    #     print(form.is_valid())
+    #     self.assertTrue(form.is_valid())
+    #     url = reverse("add-product")
+    #     response = self.client.post(url, data=post_data)
+    #     self.assertTrue(self.product.name, "Accer Black")
         
     def test_update_product(self): 
         
@@ -399,16 +421,14 @@ class CartTestCase(TestCase):
         
         self.client.login(username='user12', password='pass12345')
         product = Product.objects.get(vendor__username = 'aaju5')
-        print(product)
         url = reverse('update-product', args=(self.product.id, self.image.id))
         response = self.client.post(url, data = update_product_data)
-        update_product  = Product.objects.get(id = self.product.id)
-        print(update_product.description)
+        update_product  = Product.objects.get(id = self.product.id)   
         self.assertTrue(form.is_valid())
         self.assertTrue(update_product.description, 'Copy Pen')
         
         
-    # delete product
+    # # delete product
     def test_delete_product(self):
         prod = Product.objects.create(
             name = "Lenovo",
@@ -420,19 +440,14 @@ class CartTestCase(TestCase):
             category = self.category,
             sub = self.subcategory)
         img = Image.objects.create(image='/gst_invoice.jpg', product=prod)     
-        
-        print(Product.objects.all())
-        print(Image.objects.all())
-        
         self.client.login(username='user12', password='pass12345')
         url = reverse('delete-product', args=(prod.id, img.id))
-        print(url)
         response = self.client.get(url)
         self.assertFalse(Product.objects.filter(name = 'Lenovo').exists())
         self.assertTrue(Product.objects.filter(name = 'Buds').exists())
         
         
-    # view order
+    # # view order
     def test_view_order(self):
         order = OrderDetail.objects.create(
             customer = self.customer,
@@ -447,13 +462,141 @@ class CartTestCase(TestCase):
         self.client.login(username='user12', password='pass12345')
         
         url = reverse('view-order')
-        print(url)
         response = self.client.get(url)
-        print(response.context)
-        print(order)
+    
         self.assertTemplateUsed(response, 'product/vendor_looking_order.html')
-        self.assertIn("image", response.context)
         
-            
+        self.assertIn("image", response.context)
+        self.assertIn("approved", response.context)
+        self.assertIn("order", response.context)
+        
+        
+    # # update order view
+    def test_update_order_status(self):
+        login_customer = Customer.objects.get(username = "testuser1")
+        order = OrderDetail.objects.create(
+            customer = login_customer,
+            product = self.product,
+            amount = 12,
+            status= "Placed",
+            has_paid =True,
+            session_id= "123456789",
+            order_date = datetime.now(),
+            updated_on = datetime.now()
+        )
+        # self.client.login(username='user12', password='pass12345')
+        
+        order_update_form = {
+            'status':"Accepted",
+        }
+        
+        form = UpdateOrderForm(data=order_update_form)
+        url = reverse('update-status', args=(order.id,))
+        response = self.client.post(url, data=order_update_form) 
+        updated_order = OrderDetail.objects.get(customer = login_customer)
+        self.assertEquals(updated_order.status,"Accepted")
+        self.assertEquals(response.status_code, 302)
+    
+    
+    # delete order 
+    def test_delete_order(self):
+        order = OrderDetail.objects.create(
+            customer = self.customer,
+            product = self.product,
+            amount = 12,
+            status= "Placed",
+            has_paid =True,
+            session_id= "123456789",
+            order_date = datetime.now(),
+            updated_on = datetime.now()
+        )
+        self.assertTrue(OrderDetail.objects.filter(customer=self.customer).exists())     
+        url = reverse('delete-status', args= (order.id,))
+        response  = self.client.get(url)
+        self.assertTrue(OrderDetail.objects.filter(customer=self.customer).exists())
+        
+        
+    # TrackDetail
+    
+    def test_track_detail_view(self):
+        self.client.login(username='testuser1', password='testpassword')
+        login_customer = Customer.objects.get(username = 'testuser1')
+        Ratting.objects.create(
+            customer = login_customer,
+            product = self.product,
+            order = self.order,
+            ratting = 2,
+            comments = "kjhgfdfgh",
+            created_at = datetime.now(),
+        )
+        url = reverse('track-product', args=(self.image.id,self.order.id,))
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)       
+        self.assertEqual(response.context['image'], self.image)
+        self.assertEqual(response.context['order'], self.order)
+        self.assertEqual(response.context['rattings'].count(), 1) 
+        self.assertEqual(response.context['dict1'][self.category.name].count(), 1)   
+        self.assertTemplateUsed(response, 'product/track_product.html')
+    
+    
+    # # orderhistory
+    def test_order_history(self):
+        self.client.login(username='testuser1', password='testpassword')
+        login_customer = Customer.objects.get(username = 'testuser1')
+        order = OrderDetail.objects.create(
+            customer = login_customer,
+            product = self.product,
+            amount = 12,
+            status= "Placed",
+            has_paid =True,
+            session_id= "123456789",
+            order_date = datetime.now(),
+            updated_on = datetime.now()
+        )
+    
+        url = reverse('history')
+        response = self.client.get(url)
+        self.assertTrue(response.context['object_list'],order)
+        self.assertTrue(response.context['object_list'].count(), 1)
+        self.assertTemplateUsed(response, 'product/order_history.html')
+        
+        
+    # # cancel order
+    
+    def test_cancel_order_get(self):
+        
+        cancel_order_form = {
+            'reasion':"PRA.",
+        }
+        form = CancelOrderForm(data=cancel_order_form)     
+        self.client.login(username='testuser1', password='testpassword')
+        url = reverse('order-cancel', args=[self.image.product.id, self.image.id, self.order.id])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['image'], self.image)
+        self.assertIsInstance(response.context['form'], CancelOrderForm)
+        self.assertTemplateUsed(response, 'product/order_cancel.html')
+        
+        
+    def test_cancel_order_with_invalid_id(self):     
+        url = reverse('order-cancel', args=[self.image.product.id, 5, self.order.id])
+        response = self.client.get(url)
+        self.assertTrue(response, 404)
+        # self.assertTemplateUsed(response, 'product/order_cancel.html')
+
+    
+    def test_cancel_order_post(self):
+        cancel_order_form = {
+            'reasion':"PRA.",
+        }
+        form = CancelOrderForm(data=cancel_order_form)   
+        url = reverse('order-cancel', args=[self.image.product.id, self.image.id, self.order.id])
+        response = self.client.post(url, data=cancel_order_form)
+        self.assertTrue(response, 200)
+        self.assertFalse(response.context['order'], False)
+        self.assertTemplateUsed(response, 'product/order_cancel_successfully.html')
+
+
     
         

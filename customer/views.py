@@ -17,6 +17,10 @@ from django.utils.decorators import method_decorator
 # import ratting for product_detail
 from ratting.models import Ratting
 
+# def base(request):
+#     category = Category.objects.all()
+#     return render(request, 'customer/base.html', {'category':category})
+
 
 def home(request):
     # before pagination  
@@ -45,7 +49,8 @@ def home(request):
     dict_category = {}
     dict_subcategory = {}
     for item in category:
-        dict_category[item.name] = SubCategory.objects.filter(category__name=item.name)   
+        dict_category[item.name] = SubCategory.objects.filter(category__name=item.name)  
+         
     for sub in subcatagory:
         dict_subcategory[sub.name] = Image.objects.filter(product__sub__name=sub.name)     
     dict_list = list(dict_subcategory.items())
@@ -70,8 +75,9 @@ def CustomerRegistration(request):
     if request.method == "POST":
         form = CustomerRegistrationForm(request.POST)
         if form.is_valid():
+            # username = form.cleaned_data
             form.save()  
-            return HttpResponseRedirect('/login/')               
+            return HttpResponseRedirect('/')               
     return render(request, 'customer/customer_registration.html', {"form":form})
 
 ## login form 
@@ -115,14 +121,15 @@ class Login(View):
         return render(request, 'customer/login.html', {"form":form})
     def post(self, request):
         username = request.POST.get('username')
+        # username = username.lower()
         password = request.POST.get('password')
         user = authenticate(request, username=username, password=password)
         if user is not None:
-                login(request, user)
-                if Vendor.objects.filter(username=request.user):
-                    return HttpResponseRedirect('/product/vendor-pannel/')
-                else:   
-                    return redirect('/')      
+            login(request, user)
+            if Vendor.objects.filter(username=request.user):
+                return HttpResponseRedirect('/product/vendor-pannel/')
+            else:   
+                return redirect('/')      
         else:
             context={     
                     'message':"username password not match",
@@ -268,17 +275,19 @@ def remove_from_wishlist(request, product_id):
     product=Product.objects.get(image__id=product_id)  
     user = Customer.objects.get(username=request.user)
     try:
-        print("1")
-        wishlist_item = Wishlist.objects.get(customer=user, product=product, image=image)
-        print("2")
-        
+        wishlist_item = Wishlist.objects.get(customer=user, product=product, image=image)        
         wishlist_item.delete()
-        print("3")
         
         return JsonResponse({'message': 'Item removed from wishlist'})
         
     except Wishlist.DoesNotExist:
-        print("4")
         return JsonResponse({'message': 'Item was not in the wishlist'})
     
     
+
+def demo(request):
+    sub = SubCategory.objects.all().select_related('category')
+    cat  = Category.objects.all()
+    
+    return render(request, 'customer/demo.html', {"sub":sub, "cat":cat})
+

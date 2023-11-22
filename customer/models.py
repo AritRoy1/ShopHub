@@ -18,6 +18,10 @@ class User(AbstractUser):
     zip_code = models.IntegerField(null=True)
     
     
+    # def save(self, *args, **kwargs):
+    #     self.username = self.username.lower()
+    #     super(User, self).save(*args, **kwargs)
+    
 class Customer(User):
     """Customer Model"""
     

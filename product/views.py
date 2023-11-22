@@ -34,6 +34,7 @@ def VendorRegistration(request):
 
 # vendor redirect to vendor dashbord
 def vendor_pannel(request):
+    print(request.user)
     approved = Vendor.objects.get(username = request.user)
     return render(request, 'product/vendor_base.html', {"approved":approved})
 
@@ -54,14 +55,10 @@ def add_to_cart(request):
         
     # if the product is already in cart than redirect to show cart page 
     if product in cart_list:
-        print("1")
         return redirect('/product/show-cart')
-    else:
-        
+    else:  
         # if the product is not in cart than save it and redirect to show cart page       
-        cart.save() 
-        print("2")
-        
+        cart.save()         
         return redirect('/product/show-cart') 
    
     
@@ -376,7 +373,6 @@ def view_Order(request):
         'image':image,
         'approved':approved
     }
-    print("order")
     
     return render(request, 'product/vendor_looking_order.html', context)
  
@@ -386,7 +382,7 @@ def update_order_status(request, pk):
     if request.method =="POST":
         form = UpdateOrderForm(request.POST, instance=instance)
         if form.is_valid():
-            form.save()
+            form.save()  
             return redirect('view-order')
         
     else:
@@ -398,11 +394,11 @@ def delete_order(request, pk):
     order = OrderDetail.objects.get(pk=pk)
     order.delete()
     return redirect('view-order') 
- 
- 
+
  
 def graph_Bar(request):
     # show how many product vendor have 
+    print("lk",request.user)
     product = Product.objects.filter(vendor__username = request.user)
     count_subcategory = {}
     for item in product:
@@ -420,7 +416,6 @@ def graph_Bar(request):
     product_sub = OrderDetail.objects.filter(product__vendor__username=request.user, order_date__date = today)
     for product_amount in product_sub:
         amount += product_amount.amount
-    print("amount", amount)
     
     ## practice
     # products_by_week = OrderDetail.objects.filter(product__vendor__username=request.user).annotate(
@@ -432,7 +427,6 @@ def graph_Bar(request):
     orders_by_week = OrderDetail.objects.filter(product__vendor__username = request.user).annotate(
         week=TruncWeek('order_date')
     ).values('week').annotate(total_amount=Sum('amount'))
-    print(orders_by_week)
     
     context = {
         "subcategory":count_subcategory,
@@ -563,9 +557,7 @@ def search(request):
         return render(request, 'product/product_search.html', context)
 
 
-
-class TrackDetail(DetailView):
-    
+class TrackDetail(DetailView): 
     model = Product
     template_name = "product/track_product.html"
     def get_context_data(self, **kwargs,):
@@ -576,21 +568,21 @@ class TrackDetail(DetailView):
         
         pk=self.kwargs.get('pk')
         item_id = self.kwargs.get('item_id')
-        print(item_id)
         context = super(TrackDetail, self).get_context_data(**kwargs)
         context['image'] = Image.objects.get(product__id = pk)
         # context['order'] = OrderDetail.objects.filter(product__id = pk,customer=self.request.user)     
         context['order'] = OrderDetail.objects.get(id=item_id)     
-        context['rattings'] = Ratting.objects.filter(customer=self.request.user, product__id=pk, order__id=item_id)
+        context['rattings'] = Ratting.objects.filter(customer=self.request.user, product__id=pk, order__id=item_id)     
         context['dict1'] = dict_category
         return context
   
-# customer can see their order history   
+# customer can see their order history  
+ 
 class OrderHistoryView(View):
     category = Category.objects.all()
     dict_category = {}
     for item in category:
-        dict_category[item.name]=SubCategory.objects.filter(category__name = item.name)
+        dict_category[item.name] = SubCategory.objects.filter(category__name = item.name)
         
     def get(self, request):
         model = OrderDetail.objects.filter(customer__username=request.user)
@@ -601,23 +593,27 @@ class OrderHistoryView(View):
         return render(request, 'product/order_history.html', context)
       
 # customer can cancel there order 
+
 class CancelOrder(View):
     def get(self, request, product_id, image_id, order_id ):
-      image = Image.objects.get(pk=image_id)  
-      form = CancelOrderForm()
-      return render(request, 'product/order_cancel.html', {"form":form, "image":image})
+        image = get_object_or_404(Image,pk=image_id)  
+        form = CancelOrderForm()
+        return render(request, 'product/order_cancel.html', {"form":form, "image":image})
       
-    def post(self, request, product_id, image_id, order_id):   
-      form = CancelOrderForm(request.POST)
-      order = OrderDetail.objects.get(id=order_id)
-      if form.is_valid():  
-        order.has_paid=False
-        order.save()  
-        
-        # send mail to customer after successfully cancel order
-        subject = 'Order Cancel'
-        message = f'Your order has been cancel .. Your Paymnet will send to your account within 5 to 6 working day'
-        email_from = settings.EMAIL_HOST_USER
-        recipient_list = ['request.user.email' ]   
-        send_mail( subject, message, email_from, recipient_list ) 
-        return render(request,'product/order_cancel_successfully.html')
+    def post(self, request, product_id, image_id, order_id):
+        form = CancelOrderForm(request.POST)
+        order = get_object_or_404(OrderDetail,id=order_id)
+    
+        if form.is_valid():
+            order.has_paid = False
+            order.save()  
+            context = {
+                'order':order.has_paid
+            }
+            # send mail to customer after successfully cancel order
+            subject = 'Order Cancel'
+            message = f'Your order has been cancel .. Your Paymnet will send to your account within 5 to 6 working day'
+            email_from = settings.EMAIL_HOST_USER
+            recipient_list = ['request.user.email' ]   
+            send_mail( subject, message, email_from, recipient_list ) 
+            return render(request,'product/order_cancel_successfully.html', context)

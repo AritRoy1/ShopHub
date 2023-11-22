@@ -41,7 +41,7 @@
             Category
           </a>
          
-          <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+          {% comment %} <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
 
             {% for item, value in dict1.items %} 
             
@@ -60,11 +60,36 @@
              
             </li>
             
-            {% endfor  %}             
+            {% endfor %}             
+          </ul> {% endcomment %}
+
+
+          <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+
+            {% for item in cat %} 
+            
+            <li class="dropdown-submenu">
+              <a class="dropdown-item dropdown-toggle" href="#">{{item}}</a>
+
+                
+              <ul class="dropdown-menu">
+              
+                  {% for j in item.subcategory_set.all %}
+                  {{item_set.all}}
+                  
+                  
+                     <li><a class="dropdown-item" href="#"> {{j}} </a></li>
+                  {% endfor  %}
+              </ul>
+             
+            </li>
+            
+            {% endfor %}             
           </ul>
         </li>
 
       </ul>
+      
       {% if request.user.is_authenticated %}
 
       <li class="nav-item" style="list-style: none;">

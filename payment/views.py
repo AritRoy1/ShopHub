@@ -25,7 +25,7 @@ def create_checkout_session(request, id):
     customer  = get_object_or_404(Customer, username=request.user)
     stripe.api_key = settings.STRIPE_SECRET_KEY
     checkout_session = stripe.checkout.Session.create(
-        customer_email = request_data['email'],
+        customer_email = request.user.email,
         payment_method_types=['card'],
         line_items=[
             {

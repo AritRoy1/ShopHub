@@ -6,7 +6,6 @@ from .models import Ratting
 from payment.models import OrderDetail
 # Create your views here.
 def ratting(request):
-    print("ratting")
     if request.method=="POST":          
         product_id = request.POST.get("prod_id")
         comment = request.POST.get('comment')
@@ -17,4 +16,4 @@ def ratting(request):
         customer = Customer.objects.get(username=request.user)
         Ratting.objects.create(customer=customer, product=product, comments=comment,ratting=rating, order=order)
         return JsonResponse({"response":"successfull"})
-    return  HttpResponse("success")
+    return  HttpResponse("Fail")
