@@ -9,7 +9,6 @@ from django.db import models
 
 class User(AbstractUser):
     """AbstractUser Model"""
-    
     birth_date = models.DateField(null=True)
     phone_number = models.CharField(max_length=20)
     address = models.TextField(null=True)
@@ -18,9 +17,9 @@ class User(AbstractUser):
     zip_code = models.IntegerField(null=True)
     
     
-    # def save(self, *args, **kwargs):
-    #     self.username = self.username.lower()
-    #     super(User, self).save(*args, **kwargs)
+    def save(self, *args, **kwargs):
+        self.username = self.username.lower()
+        super(User, self).save(*args, **kwargs)
     
 class Customer(User):
     """Customer Model"""

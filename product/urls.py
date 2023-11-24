@@ -28,6 +28,7 @@ urlpatterns = [
     path('minuscart/', views.minus_cart, name='minuscart'),
     path('removecart/', views.remove_cart, name = 'removecart'),
     path('search/', views.search, name = 'search'),
+    path('delivery/<int:prod_id>/', views.deliveryAddress, name = 'delivery')
   
     
 ]

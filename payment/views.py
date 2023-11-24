@@ -15,14 +15,15 @@ from django.core.mail import send_mail
 from django.urls import reverse
 
 
+
 # Create your views here.
 
 # create a checkout session for payment
 @csrf_exempt
 def create_checkout_session(request, id):
-    request_data = json.loads(request.body)
+    # request_data = json.loads(request.body)
     product = get_object_or_404(Product, pk=id)
-    customer  = get_object_or_404(Customer, username=request.user)
+    customer  = get_object_or_404(Customer, username=request.user)    
     stripe.api_key = settings.STRIPE_SECRET_KEY
     checkout_session = stripe.checkout.Session.create(
         customer_email = request.user.email,
@@ -46,13 +47,15 @@ def create_checkout_session(request, id):
         ) + "?session_id={CHECKOUT_SESSION_ID}",
         cancel_url=request.build_absolute_uri(reverse('failed')),
     )
-    order = OrderDetail()
+    
+    order = OrderDetail() 
+    print(checkout_session['id'])
     order.customer = customer
     order.product = product
     order.session_id = checkout_session['id']  
-    order.amount = int(product.price)  
+    order.amount = int(product.price)      
     order.save()
-    return JsonResponse({'sessionId': checkout_session.id})
+    return JsonResponse({'sessionId': checkout_session['id'] })
 
 
 class PaymentSuccessView(TemplateView):

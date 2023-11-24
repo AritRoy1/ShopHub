@@ -84,7 +84,8 @@
         
       </div>
     </form>
-    <button type="submit" class="btn btn-info shadow px-5 py-2" id="checkout-button" >Buy Now</button>
+    
+   <a href="{% url 'delivery' img.product.id %}"> <button type="submit" class="btn btn-info shadow px-5 py-2" >Buy Now</button> </a>
 
     
 
@@ -136,7 +137,7 @@
 
 
 
-
+{% comment %} wishlist {% endcomment %}
 
 <script>
   document.querySelectorAll('.wishlist-button').forEach(function(button) {
@@ -184,7 +185,7 @@
 
 {% comment %} payment scripts {% endcomment %}
 
-<script src="https://js.stripe.com/v3/"></script>
+{% comment %} <script src="https://js.stripe.com/v3/"></script>
 <script type="text/javascript">
     // Create an instance of the Stripe object with your publishable API key
     var stripe = Stripe('{{ stripe_publishable_key }}');
@@ -220,7 +221,7 @@
                 console.error('Error:', error);
             });
     });
-</script>
+</script> {% endcomment %}
 
   {% comment %} show more review {% endcomment %}
 

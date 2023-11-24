@@ -11,6 +11,7 @@
    
     <link rel="stylesheet" href="{% static 'customer/css/style.css' %}">
     <title>ShopHub</title>
+    
   </head>
   <body>
 
@@ -72,20 +73,20 @@
       </li>
 
 
-      <li class="nav-item dropdown" style="list-style: none;">
-        <a class="nav-link dropdown-toggle"  style="color: black; font-size:20px;"  href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      <li class="nav-item dropdown !important" style="list-style: none; !important">
+        <a class="nav-link dropdown-toggle !important"  style="color: black; font-size:20px;"  href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           Profile
         </a>
         
-        
-        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+       
+         <div class="dropdown-menu !important" aria-labelledby="navbarDropdown !important">
          
-          <a class="dropdown-item" href="{% url 'profile' %}">My Profile</a>
-          <a class="dropdown-item" href="{% url 'wishlist' %}">WishList</a>
-          <a class="dropdown-item" href="{% url 'history' %}">My Orders</a>
+          <a class="dropdown-item !important" href="{% url 'profile' %}">My Profile</a>
+          <a class="dropdown-item !important" href="{% url 'wishlist' %}">WishList</a>
+          <a class="dropdown-item !important" href="{% url 'history' %}">My Orders</a>
 
 
-          <a class="dropdown-item" href="{% url 'logout' %}">LogOut</a>
+          <a class="dropdown-item !important" href="{% url 'logout' %}">LogOut</a>
 
           </div> 
         </li>
@@ -123,6 +124,12 @@
 
 
 </div>
+
+
+{% block cont %}
+
+{% endblock cont %}
+
 
 {% block content %}
 {% endblock content %}
